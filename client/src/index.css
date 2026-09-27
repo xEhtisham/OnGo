@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+@theme {
+  /* OnGo Brand Colors */
+  --color-primary: #4F46E5;
+  --color-primary-light: #6366F1;
+  --color-primary-dark: #4338CA;
+
+  --color-coral: #FF5A36;
+  --color-coral-light: #FF7A5C;
+  --color-coral-dark: #E5442A;
+
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+
+  --color-bg: #F8FAFC;
+  --color-card: #FFFFFF;
+  --color-border: #E2E8F0;
+
+  --color-text: #0F172A;
+  --color-muted: #64748B;
+
+  /* Typography */
+  --font-sans: 'Manrope', system-ui, -apple-system, sans-serif;
+}

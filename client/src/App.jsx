@@ -1,8 +1,7 @@
 function App() {
   return (
-    <div>
-      <h1>OnGo</h1>
-      <p>Event discovery, ticketing, and event management platform.</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <h1 className="text-3xl font-bold text-gray-900">OnGo</h1>
     </div>
   );
 }

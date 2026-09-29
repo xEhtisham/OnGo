@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import connectDB from './config/db.js';
 import healthRoutes from './routes/healthRoutes.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
@@ -26,9 +27,19 @@ app.use('/api/health', healthRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Start HTTP Server
-app.listen(PORT, () => {
-  console.log(`[OnGo Server] Running on http://localhost:${PORT}`);
-});
+// Start HTTP Server only after successful database connection
+async function startServer() {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`[OnGo Server] Running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error(`[Server Error] Failed to start server: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 export default app;

@@ -1,14 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import RootLayout from './layouts/RootLayout';
 import Home from './pages/Home';
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-bg text-text font-sans antialiased">
-        <Routes>
+      <Routes>
+        <Route element={<RootLayout />}>
           <Route path="/" element={<Home />} />
-        </Routes>
-      </div>
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }

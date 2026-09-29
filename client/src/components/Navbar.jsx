@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Button from './Button';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   const navLinkClasses = ({ isActive }) =>
     `text-sm font-medium transition-colors ${
       isActive ? 'text-primary font-semibold' : 'text-muted hover:text-text'
     }`;
+
+  const handleLogout = () => {
+    setMobileMenuOpen(false);
+    logout();
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">
@@ -33,21 +40,42 @@ export default function Navbar() {
               <NavLink to="/explore" className={navLinkClasses}>
                 Explore
               </NavLink>
+              {isAuthenticated && (
+                <NavLink to="/profile" className={navLinkClasses}>
+                  My Account
+                </NavLink>
+              )}
             </nav>
           </div>
 
-          {/* Desktop Auth CTAs */}
+          {/* Desktop Auth Section */}
           <div className="hidden md:flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="ghost" size="sm">
-                Log In
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button variant="cta" size="sm">
-                Get Started
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <Link to="/profile" className="flex items-center gap-2 text-sm font-semibold text-text hover:text-primary transition-colors">
+                  <span className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                    {user?.name ? user.name[0].toUpperCase() : 'U'}
+                  </span>
+                  <span>{user?.name?.split(' ')[0] || 'Account'}</span>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">
+                    Log In
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="cta" size="sm">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -104,18 +132,35 @@ export default function Navbar() {
             >
               Explore
             </NavLink>
+            {isAuthenticated && (
+              <NavLink
+                to="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className={navLinkClasses}
+              >
+                My Account
+              </NavLink>
+            )}
           </nav>
           <div className="pt-3 border-t border-border flex flex-col gap-2">
-            <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="outline" size="sm" className="w-full">
-                Log In
+            {isAuthenticated ? (
+              <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
+                Sign Out
               </Button>
-            </Link>
-            <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="cta" size="sm" className="w-full">
-                Get Started
-              </Button>
-            </Link>
+            ) : (
+              <>
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="outline" size="sm" className="w-full">
+                    Log In
+                  </Button>
+                </Link>
+                <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="cta" size="sm" className="w-full">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

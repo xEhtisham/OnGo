@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
+import { generateToken } from '../utils/generateToken.js';
 
 // Email validation helper
 const isValidEmail = (email) => {
@@ -69,12 +70,71 @@ export async function register(req, res, next) {
       password: hashedPassword,
     });
 
-    // Return safe user representation (password stripped by User schema toJSON)
+    // Generate JWT token
+    const token = generateToken(user._id);
+
+    // Return safe user representation
     return res.status(201).json({
       status: 'success',
       message: 'User registered successfully',
       data: {
         user: user.toJSON(),
+        token,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// @desc    Authenticate user & get JWT token
+// @route   POST /api/auth/login
+// @access  Public
+export async function login(req, res, next) {
+  try {
+    const { email, password } = req.body;
+
+    // Validate input presence
+    if (!email || !password) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Email and password are required',
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Query user by email (explicitly selecting hidden password)
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
+
+    // Generic error message prevents account enumeration attacks
+    const invalidAuthMessage = 'Invalid email or password';
+
+    if (!user) {
+      return res.status(401).json({
+        status: 'error',
+        message: invalidAuthMessage,
+      });
+    }
+
+    // Compare provided password with hashed password in database
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        status: 'error',
+        message: invalidAuthMessage,
+      });
+    }
+
+    // Generate JWT token
+    const token = generateToken(user._id);
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Login successful',
+      data: {
+        user: user.toJSON(),
+        token,
       },
     });
   } catch (error) {

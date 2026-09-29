@@ -141,3 +141,20 @@ export async function login(req, res, next) {
     next(error);
   }
 }
+
+// @desc    Get currently authenticated user
+// @route   GET /api/auth/me
+// @access  Private (Protected by JWT)
+export async function getMe(req, res, next) {
+  try {
+    // req.user was populated by the protect middleware
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        user: req.user.toJSON(),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}

@@ -1,12 +1,14 @@
 import express from 'express';
-import { register, login } from '../controllers/authController.js';
+import { register, login, getMe } from '../controllers/authController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// POST /api/auth/register - Register a new user
+// Public routes
 router.post('/register', register);
-
-// POST /api/auth/login - Authenticate user & get JWT
 router.post('/login', login);
+
+// Protected routes (Requires valid JWT in Authorization header)
+router.get('/me', protect, getMe);
 
 export default router;

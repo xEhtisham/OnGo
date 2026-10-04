@@ -63,6 +63,22 @@ export const api = {
     }),
 
   // Events & Organizer API
+  getPublicEvents: (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.search) query.append('search', params.search);
+    if (params.category && params.category !== 'All') query.append('category', params.category);
+    if (params.city && params.city !== 'All') query.append('city', params.city);
+    if (params.timeframe) query.append('timeframe', params.timeframe);
+    if (params.date) query.append('date', params.date);
+    if (params.sort) query.append('sort', params.sort);
+    if (params.page) query.append('page', params.page);
+    if (params.limit) query.append('limit', params.limit);
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return request(`/events${queryString}`, {
+      method: 'GET',
+    });
+  },
+
   createEvent: (eventData) =>
     request('/events', {
       method: 'POST',

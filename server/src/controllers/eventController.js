@@ -79,6 +79,117 @@ export async function createEvent(req, res, next) {
   }
 }
 
+// @desc    Get published events for public discovery (with search, category, city, date & pagination)
+// @route   GET /api/events
+// @access  Public
+export async function getPublicEvents(req, res, next) {
+  try {
+    const {
+      search,
+      category,
+      city,
+      timeframe,
+      date,
+      sort = 'date-asc',
+      page = 1,
+      limit = 12,
+    } = req.query;
+
+    const query = {
+      status: { $in: ['Published', 'Sold Out'] },
+    };
+
+    // Category filter
+    if (category && category !== 'All') {
+      query.category = category;
+    }
+
+    // City filter (case-insensitive)
+    if (city && city !== 'All') {
+      query.city = new RegExp(`^${city.trim()}$`, 'i');
+    }
+
+    // Text search across title, description, venueName, and city
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      query.$or = [
+        { title: searchRegex },
+        { description: searchRegex },
+        { venueName: searchRegex },
+        { city: searchRegex },
+      ];
+    }
+
+    // Date & Timeframe filters
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    if (date) {
+      // Specific date filtering (YYYY-MM-DD)
+      const targetDate = new Date(date);
+      if (!isNaN(targetDate.getTime())) {
+        const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+        const endOfDay = new Date(
+          targetDate.getFullYear(),
+          targetDate.getMonth(),
+          targetDate.getDate(),
+          23,
+          59,
+          59,
+          999
+        );
+        query.date = { $gte: startOfDay, $lte: endOfDay };
+      }
+    } else if (timeframe === 'today') {
+      const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+      query.date = { $gte: startOfToday, $lte: endOfToday };
+    } else if (timeframe === 'this-weekend') {
+      const dayOfWeek = now.getDay();
+      const daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+      const friday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilFriday);
+      const sunday = new Date(friday.getFullYear(), friday.getMonth(), friday.getDate() + 2, 23, 59, 59, 999);
+      query.date = { $gte: friday, $lte: sunday };
+    } else if (timeframe === 'this-month') {
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      query.date = { $gte: startOfToday, $lte: endOfMonth };
+    } else if (timeframe !== 'all') {
+      // Default: show upcoming events from today onwards
+      query.date = { $gte: startOfToday };
+    }
+
+    // Sorting options
+    let sortOption = { date: 1, startTime: 1 };
+    if (sort === 'date-desc') {
+      sortOption = { date: -1 };
+    } else if (sort === 'newest') {
+      sortOption = { createdAt: -1 };
+    }
+
+    // Pagination
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10) || 12));
+    const skip = (pageNum - 1) * limitNum;
+
+    const total = await Event.countDocuments(query);
+    const events = await Event.find(query)
+      .populate('organizer', 'name email')
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limitNum);
+
+    return res.status(200).json({
+      status: 'success',
+      count: events.length,
+      total,
+      page: pageNum,
+      totalPages: Math.ceil(total / limitNum) || 1,
+      data: { events },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // @desc    Get all events created by the logged-in organizer
 // @route   GET /api/events/organizer
 // @access  Private (Organizer)

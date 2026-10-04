@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   createEvent,
+  getPublicEvents,
   getOrganizerEvents,
   getOrganizerStats,
   getEventById,
@@ -14,6 +15,9 @@ const router = express.Router();
 // Organizer specific routes (must be before /:id)
 router.get('/organizer', protect, getOrganizerEvents);
 router.get('/organizer/stats', protect, getOrganizerStats);
+
+// Public event discovery
+router.get('/', getPublicEvents);
 
 // General event CRUD
 router.post('/', protect, createEvent);

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Button from '../components/Button';
 import { Card, CardTitle, CardDescription } from '../components/Card';
+import CheckoutModal from '../components/CheckoutModal';
 
 export default function EventDetails() {
   const { id } = useParams();
@@ -12,6 +13,7 @@ export default function EventDetails() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   // Selected quantities for each ticket type: { [ticketId]: quantity }
   const [selectedQuantities, setSelectedQuantities] = useState({});
@@ -119,9 +121,25 @@ export default function EventDetails() {
 
   const handleBookingClick = () => {
     if (totalSelectedTickets === 0) return;
-    alert(
-      `Ticket selection confirmed!\n\nTickets: ${totalSelectedTickets}\nTotal Amount: PKR ${totalPrice.toLocaleString()}\n\nNote: Online checkout and ticket issuance will be completed in Module 3.`
-    );
+    setIsCheckoutOpen(true);
+  };
+
+  const handleBookingSuccess = async () => {
+    try {
+      // Reload event to update remaining ticket capacities
+      const response = await api.getEventById(id);
+      if (response?.data?.event) {
+        setEvent(response.data.event);
+        // Reset selected quantities
+        const reset = {};
+        response.data.event.ticketTypes?.forEach((t) => {
+          reset[t._id] = 0;
+        });
+        setSelectedQuantities(reset);
+      }
+    } catch (err) {
+      console.error('Error refreshing event capacity:', err);
+    }
   };
 
   return (
@@ -358,6 +376,17 @@ export default function EventDetails() {
           </Card>
         </div>
       </div>
+
+      {/* Checkout & Reservation Modal */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        event={event}
+        selectedQuantities={selectedQuantities}
+        totalSelectedTickets={totalSelectedTickets}
+        totalPrice={totalPrice}
+        onBookingSuccess={handleBookingSuccess}
+      />
     </div>
   );
 }

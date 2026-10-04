@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import Dashboard from './pages/organizer/Dashboard';
 import CreateEvent from './pages/organizer/CreateEvent';
 import EditEvent from './pages/organizer/EditEvent';
 
@@ -26,7 +27,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            {/* Organizer Event Management */}
+            {/* Organizer Routes */}
+            <Route
+              path="/organizer/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/organizer/events/new"
               element={

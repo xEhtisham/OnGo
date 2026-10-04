@@ -2,6 +2,13 @@
 
 OnGo is a full-stack event discovery, ticketing, and event management platform. It connects attendees seeking memorable live experiences with event organizers looking to publish, market, manage, and verify tickets.
 
+> ### 🎓 Zynvex Solutions Internship — Project Status (Batch 4)
+> - **Student Name**: Ehtisham Ul Hassan
+> - **Internship ID**: `ZYNVEX-CERT-1436`
+> - **Module 1**: Completed & Verified (`Sep 27, 2026`)
+> - **Module 2 (Today's Submission Milestone)**: **Completed & Verified** (`Oct 04, 2026`) — Tag: [`v2.0-module-2`](https://github.com/xEhtisham/OnGo/releases/tag/v2.0-module-2) \| Branch: [`module-2-release`](https://github.com/xEhtisham/OnGo/tree/module-2-release)
+> - **Module 3**: Completed ahead of schedule (`Oct 04, 2026`, scheduled for `Oct 11`)
+
 ## Tech Stack
 
 - **Frontend**: React (Vite), Tailwind CSS, React Router

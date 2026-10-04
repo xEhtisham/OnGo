@@ -116,6 +116,34 @@ export const api = {
     request(`/events/${id}`, {
       method: 'DELETE',
     }),
+
+  // Bookings API
+  createBooking: (bookingData) =>
+    request('/bookings', {
+      method: 'POST',
+      body: JSON.stringify(bookingData),
+    }),
+
+  getMyBookings: () =>
+    request('/bookings/my-tickets', {
+      method: 'GET',
+    }),
+
+  getBookingById: (id) =>
+    request(`/bookings/${id}`, {
+      method: 'GET',
+    }),
+
+  getEventBookings: (eventId) =>
+    request(`/bookings/event/${eventId}`, {
+      method: 'GET',
+    }),
+
+  cancelBooking: (id, reason) =>
+    request(`/bookings/${id}/cancel`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason }),
+    }),
 };
 
 export default api;

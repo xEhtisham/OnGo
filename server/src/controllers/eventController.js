@@ -1,4 +1,5 @@
 import Event from '../models/Event.js';
+import Booking from '../models/Booking.js';
 
 // @desc    Create a new event (Draft or Published)
 // @route   POST /api/events
@@ -253,8 +254,12 @@ export async function getOrganizerStats(req, res, next) {
       return total + eventSold;
     }, 0);
 
-    // Bookings count (will synchronize with bookings in Module 3)
-    const totalBookings = 0;
+    // Bookings count synchronized with live Booking collection
+    const eventIds = events.map((e) => e._id);
+    const totalBookings = await Booking.countDocuments({
+      event: { $in: eventIds },
+      status: 'Confirmed',
+    });
 
     return res.status(200).json({
       status: 'success',

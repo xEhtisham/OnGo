@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import RootLayout from './layouts/RootLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
+import Explore from './pages/Explore';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route element={<RootLayout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/explore" element={<Explore />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/events/:id" element={<EventDetails />} />

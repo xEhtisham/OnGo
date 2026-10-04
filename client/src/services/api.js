@@ -61,6 +61,45 @@ export const api = {
     request('/auth/me', {
       method: 'GET',
     }),
+
+  // Events & Organizer API
+  createEvent: (eventData) =>
+    request('/events', {
+      method: 'POST',
+      body: JSON.stringify(eventData),
+    }),
+
+  getOrganizerEvents: (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.status) query.append('status', params.status);
+    if (params.search) query.append('search', params.search);
+    if (params.category) query.append('category', params.category);
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return request(`/events/organizer${queryString}`, {
+      method: 'GET',
+    });
+  },
+
+  getOrganizerStats: () =>
+    request('/events/organizer/stats', {
+      method: 'GET',
+    }),
+
+  getEventById: (id) =>
+    request(`/events/${id}`, {
+      method: 'GET',
+    }),
+
+  updateEvent: (id, eventData) =>
+    request(`/events/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(eventData),
+    }),
+
+  deleteEvent: (id) =>
+    request(`/events/${id}`, {
+      method: 'DELETE',
+    }),
 };
 
 export default api;

@@ -40,19 +40,34 @@ export default function Navbar() {
               <NavLink to="/explore" className={navLinkClasses}>
                 Explore
               </NavLink>
+
+              {/* Organizer navigation links */}
               {isAuthenticated && (
-                <NavLink to="/profile" className={navLinkClasses}>
-                  My Account
-                </NavLink>
+                <>
+                  <NavLink to="/organizer/dashboard" className={navLinkClasses}>
+                    Dashboard
+                  </NavLink>
+                  <NavLink to="/organizer/events" className={navLinkClasses}>
+                    My Events
+                  </NavLink>
+                </>
               )}
             </nav>
           </div>
 
-          {/* Desktop Auth Section */}
+          {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
-                <Link to="/profile" className="flex items-center gap-2 text-sm font-semibold text-text hover:text-primary transition-colors">
+                <Link to="/organizer/events/new">
+                  <Button variant="cta" size="sm">
+                    + Create Event
+                  </Button>
+                </Link>
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 text-sm font-semibold text-text hover:text-primary transition-colors px-2 py-1.5 rounded-lg hover:bg-slate-50"
+                >
                   <span className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
                     {user?.name ? user.name[0].toUpperCase() : 'U'}
                   </span>
@@ -133,20 +148,44 @@ export default function Navbar() {
               Explore
             </NavLink>
             {isAuthenticated && (
-              <NavLink
-                to="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className={navLinkClasses}
-              >
-                My Account
-              </NavLink>
+              <>
+                <NavLink
+                  to="/organizer/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={navLinkClasses}
+                >
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  to="/organizer/events"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={navLinkClasses}
+                >
+                  My Events
+                </NavLink>
+                <NavLink
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={navLinkClasses}
+                >
+                  My Account
+                </NavLink>
+              </>
             )}
           </nav>
+
           <div className="pt-3 border-t border-border flex flex-col gap-2">
             {isAuthenticated ? (
-              <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
-                Sign Out
-              </Button>
+              <>
+                <Link to="/organizer/events/new" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="cta" size="sm" className="w-full">
+                    + Create Event
+                  </Button>
+                </Link>
+                <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
+                  Sign Out
+                </Button>
+              </>
             ) : (
               <>
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)}>

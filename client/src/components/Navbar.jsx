@@ -41,9 +41,12 @@ export default function Navbar() {
                 Explore
               </NavLink>
 
-              {/* Organizer navigation links */}
+              {/* Authenticated attendee & organizer navigation links */}
               {isAuthenticated && (
                 <>
+                  <NavLink to="/my-tickets" className={navLinkClasses}>
+                    My Tickets
+                  </NavLink>
                   <NavLink to="/organizer/dashboard" className={navLinkClasses}>
                     Dashboard
                   </NavLink>
@@ -149,6 +152,13 @@ export default function Navbar() {
             </NavLink>
             {isAuthenticated && (
               <>
+                <NavLink
+                  to="/my-tickets"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={navLinkClasses}
+                >
+                  My Tickets
+                </NavLink>
                 <NavLink
                   to="/organizer/dashboard"
                   onClick={() => setMobileMenuOpen(false)}

@@ -7,6 +7,7 @@ import Explore from './pages/Explore';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import MyTickets from './pages/MyTickets';
 import EventDetails from './pages/EventDetails';
 import Dashboard from './pages/organizer/Dashboard';
 import MyEvents from './pages/organizer/MyEvents';
@@ -24,6 +25,14 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/events/:id" element={<EventDetails />} />
+            <Route
+              path="/my-tickets"
+              element={
+                <ProtectedRoute>
+                  <MyTickets />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/profile"
               element={

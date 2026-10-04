@@ -29,6 +29,26 @@ export default function MyEvents() {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [deletingId, setDeletingId] = useState(null);
 
+  // Attendee roster state
+  const [attendeeModalEvent, setAttendeeModalEvent] = useState(null);
+  const [eventAttendees, setEventAttendees] = useState([]);
+  const [loadingAttendees, setLoadingAttendees] = useState(false);
+  const [attendeeError, setAttendeeError] = useState('');
+
+  const handleOpenAttendees = async (event) => {
+    setAttendeeModalEvent(event);
+    try {
+      setLoadingAttendees(true);
+      setAttendeeError('');
+      const res = await api.getEventBookings(event._id);
+      setEventAttendees(res?.data?.bookings || []);
+    } catch (err) {
+      setAttendeeError(err.message || 'Failed to load attendee roster');
+    } finally {
+      setLoadingAttendees(false);
+    }
+  };
+
   const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
@@ -297,15 +317,22 @@ export default function MyEvents() {
                       </Button>
                     </Link>
                   ) : (
-                    <div className="flex items-center gap-2 flex-1">
+                    <div className="flex items-center gap-1.5 flex-1">
                       <Link to={`/events/${event._id}`} className="flex-1">
-                        <Button variant="ghost" size="sm" className="w-full">
+                        <Button variant="ghost" size="sm" className="w-full text-xs">
                           View
                         </Button>
                       </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenAttendees(event)}
+                        className="flex-1 px-2.5 py-1.5 rounded-xl border border-indigo-200 bg-indigo-50/60 hover:bg-indigo-100 text-primary text-xs font-bold transition-colors"
+                      >
+                        Attendees
+                      </button>
                       <Link to={`/organizer/events/${event._id}/edit`} className="flex-1">
-                        <Button variant="outline" size="sm" className="w-full">
-                          Manage
+                        <Button variant="outline" size="sm" className="w-full text-xs">
+                          Edit
                         </Button>
                       </Link>
                     </div>
@@ -372,6 +399,110 @@ export default function MyEvents() {
             </Link>
           )}
         </Card>
+      )}
+
+      {/* Attendee Roster Modal */}
+      {attendeeModalEvent && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="relative bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-border space-y-6 animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <div>
+                <h3 className="text-xl font-extrabold text-text">Attendee Roster</h3>
+                <p className="text-xs text-muted mt-0.5">{attendeeModalEvent.title}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAttendeeModalEvent(null)}
+                className="p-1.5 rounded-full text-slate-400 hover:text-text hover:bg-slate-100 transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Quick Metrics */}
+            <div className="grid grid-cols-2 gap-3 text-center">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-border">
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                  Confirmed Bookings
+                </span>
+                <span className="text-xl font-extrabold text-primary">
+                  {eventAttendees.length}
+                </span>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-2xl border border-border">
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                  Tickets Reserved
+                </span>
+                <span className="text-xl font-extrabold text-text">
+                  {eventAttendees.reduce((sum, b) => sum + (b.totalTickets || 0), 0)}
+                </span>
+              </div>
+            </div>
+
+            {/* Body */}
+            {loadingAttendees ? (
+              <div className="py-12 flex flex-col items-center justify-center gap-2">
+                <div className="w-7 h-7 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+                <p className="text-xs text-muted">Loading attendee list...</p>
+              </div>
+            ) : attendeeError ? (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+                {attendeeError}
+              </div>
+            ) : eventAttendees.length === 0 ? (
+              <div className="py-12 text-center space-y-2">
+                <span className="text-3xl">👥</span>
+                <h4 className="text-sm font-bold text-text">No attendees yet</h4>
+                <p className="text-xs text-muted max-w-xs mx-auto">
+                  When attendees reserve tickets for this event, their contact information and booking references will appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="max-h-80 overflow-y-auto space-y-3 pr-1">
+                {eventAttendees.map((booking) => (
+                  <div
+                    key={booking._id}
+                    className="p-3.5 bg-slate-50/70 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <strong className="text-text font-bold text-sm">
+                          {booking.attendeeDetails?.fullName || booking.user?.name || 'Attendee'}
+                        </strong>
+                        <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-mono text-[10px] font-bold">
+                          {booking.bookingReference}
+                        </span>
+                      </div>
+                      <p className="text-muted text-[11px]">
+                        {booking.attendeeDetails?.email || booking.user?.email}{' '}
+                        {booking.attendeeDetails?.phone ? `• ${booking.attendeeDetails.phone}` : ''}
+                      </p>
+                    </div>
+
+                    <div className="sm:text-right space-y-0.5 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200">
+                      <div className="font-semibold text-text">
+                        {booking.tickets?.map((t) => `${t.name} (×${t.quantity})`).join(', ')}
+                      </div>
+                      <div className="text-[11px] text-muted font-bold text-primary">
+                        PKR {booking.totalAmount?.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <Button
+              variant="outline"
+              size="md"
+              className="w-full"
+              onClick={() => setAttendeeModalEvent(null)}
+            >
+              Close Roster
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

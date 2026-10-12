@@ -4,13 +4,15 @@ import api from '../services/api';
 import Button from '../components/Button';
 import { Card } from '../components/Card';
 import TicketPass from '../components/TicketPass';
+import CancelBookingModal from '../components/CancelBookingModal';
 
 export default function MyTickets() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('All');
-  const [cancellingId, setCancellingId] = useState(null);
+  const [cancelModalBooking, setCancelModalBooking] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [activeTicketModal, setActiveTicketModal] = useState(null);
   const [copiedRef, setCopiedRef] = useState(null);
 
@@ -37,23 +39,16 @@ export default function MyTickets() {
     setTimeout(() => setCopiedRef(null), 2000);
   };
 
-  const handleCancelBooking = async (bookingId, bookingRef) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to cancel reservation ${bookingRef}? Your reserved tickets will be released back to the event.`
-      )
-    ) {
-      return;
-    }
-
+  const handleConfirmCancel = async (bookingId, reason) => {
     try {
-      setCancellingId(bookingId);
-      await api.cancelBooking(bookingId, 'Attendee requested cancellation');
+      setIsCancelling(true);
+      await api.cancelBooking(bookingId, reason);
+      setCancelModalBooking(null);
       await fetchBookings();
     } catch (err) {
       alert(err.message || 'Failed to cancel reservation');
     } finally {
-      setCancellingId(null);
+      setIsCancelling(false);
     }
   };
 
@@ -345,11 +340,10 @@ export default function MyTickets() {
                     {isUpcoming && (
                       <button
                         type="button"
-                        disabled={cancellingId === b._id}
-                        onClick={() => handleCancelBooking(b._id, b.bookingReference)}
-                        className="text-[11px] text-rose-600 hover:text-rose-800 font-semibold hover:underline text-center pt-1 disabled:opacity-50"
+                        onClick={() => setCancelModalBooking(b)}
+                        className="text-[11px] text-rose-600 hover:text-rose-800 font-semibold hover:underline text-center pt-1"
                       >
-                        {cancellingId === b._id ? 'Cancelling...' : 'Cancel Reservation'}
+                        Cancel Reservation
                       </button>
                     )}
                   </div>
@@ -365,6 +359,17 @@ export default function MyTickets() {
         <TicketPass
           booking={activeTicketModal}
           onClose={() => setActiveTicketModal(null)}
+        />
+      )}
+
+      {/* Structured Cancellation Modal */}
+      {cancelModalBooking && (
+        <CancelBookingModal
+          booking={cancelModalBooking}
+          isOpen={!!cancelModalBooking}
+          onClose={() => setCancelModalBooking(null)}
+          onConfirm={handleConfirmCancel}
+          loading={isCancelling}
         />
       )}
     </div>

@@ -6,8 +6,8 @@ OnGo is a full-stack event discovery, ticketing, and event management platform. 
 > - **Student Name**: Ehtisham Ul Hassan
 > - **Internship ID**: `ZYNVEX-CERT-1436`
 > - **Module 1**: Completed & Verified (`Sep 27, 2026`)
-> - **Module 2 (Today's Submission Milestone)**: **Completed & Verified** (`Oct 04, 2026`) — Tag: [`v2.0-module-2`](https://github.com/xEhtisham/OnGo/releases/tag/v2.0-module-2) \| Branch: [`module-2-release`](https://github.com/xEhtisham/OnGo/tree/module-2-release)
-> - **Module 3**: Completed ahead of schedule (`Oct 04, 2026`, scheduled for `Oct 11`)
+> - **Module 2**: Completed & Verified (`Oct 04, 2026`) — Tag: [`v2.0-module-2`](https://github.com/xEhtisham/OnGo/releases/tag/v2.0-module-2)
+> - **Module 3**: **Completed & Fully Verified** (`Oct 12, 2026`)
 
 ## Tech Stack
 
@@ -69,41 +69,48 @@ Module 2 delivers complete event creation, inventory management, and organizer a
 
 ## Module 3 — Event Discovery, Ticketing & Booking System
 
-Module 3 delivers a complete end-to-end event discovery marketplace and attendee reservation engine:
+Module 3 delivers an advanced event discovery marketplace, robust atomic ticketing engine, and rich attendee/organizer tools:
 - **Public Event Discovery API (`GET /api/events`)**:
   - Visibility protection: Exclusively exposes `Published` and `Sold Out` events, preventing leaks of drafts or deleted events
   - Full-text multi-field search across `title`, `description`, `venueName`, and `city`
   - Multi-facet filtering: Category pills (8 categories), City selector (Pakistani metropolises), and timeframe (`today`, `this-weekend`, `this-month`, `upcoming`)
+  - **Price Range & Availability Filters**: `$elemMatch` ticket price filtering supporting `minPrice`, `maxPrice`, and `availability=available`
   - Sorting (`soonest`, `latest`, `newest`) and pagination with total count and page metadata
 - **Explore Marketplace UI (`/explore` & Home page)**:
   - Reusable `EventCard` component with cover hover zoom, category chip, formatted dates, venue pin, minimum PKR pricing, and remaining seats counter
   - Interactive Search & Filter Hub with URL search parameter synchronization
+  - Price preset chips (`All Prices`, `Free`, `Under PKR 2K`, `PKR 2K - 5K`, `PKR 5K+`), custom price inputs, and availability toggle
   - Animated loading skeletons and contextual empty states with "Reset Filters" action
-  - Living marketplace showcase on Home page with popular city quick links
-- **Booking Data Model (`Booking.js`)**:
-  - Unique booking reference generator producing human-readable codes (`OG-XXXX-XXXX`)
-  - Multi-tier ticket subdocuments capturing tier ID, tier name, unit price, quantity, and subtotal
-  - Pre-validation hook auto-calculating `totalTickets`, `totalAmount`, and generating references
-  - Compound indexes on `{ user: 1, createdAt: -1 }`, `{ event: 1, createdAt: -1 }`, and unique reference code
+- **Interactive Event Details & Social Sharing (`EventDetails.jsx`)**:
+  - Dynamic tier capacity progress meters with real-time remaining seat badges
+  - One-click `.ics` Calendar export for Google Calendar, Apple Calendar, and Outlook
+  - Social sharing actions: WhatsApp direct invite and instant clipboard link copy
+  - **Similar Events Discovery**: Category-based event cross-recommendations with instant navigation
 - **Atomic Booking Engine API (`/api/bookings`)**:
+  - Unique booking reference generator producing human-readable codes (`OG-XXXX-XXXX`)
   - `POST /api/bookings`: Enforces per-order limits (`maxTicketsPerBooking`), verifies remaining tier availability, atomically increments `sold` counts, marks events as `Sold Out` upon reaching capacity, and returns confirmed reservation
   - `GET /api/bookings/my-tickets`: Retrieves authenticated attendee's ticket history with populated event and organizer contacts
   - `GET /api/bookings/:id`: Protected single booking lookup with attendee and organizer authorization checks
   - `GET /api/bookings/event/:eventId`: Organizer endpoint to view complete attendee rosters for their events
   - `PUT /api/bookings/:id/cancel`: Cancellation flow releasing ticket capacity back to the event and re-opening `Published` status
 - **Interactive Checkout Flow (`CheckoutModal.jsx`)**:
-  - Integrated into `EventDetails.jsx` ticket widget
-  - Pre-fills authenticated attendee contact information
+  - Integrated into `EventDetails.jsx` ticket widget with live PKR subtotal calculation
+  - Pre-fills authenticated attendee contact information with phone number validation
   - Real-time reservation dispatch with instant post-booking celebration view
   - Copyable booking reference code and one-click transition to attendee tickets
 - **Attendee Dashboard ("My Tickets" — `/my-tickets`)**:
+  - **Overview Metrics**: Live cards for Upcoming Events, Passes Reserved, and Total Invested (PKR)
+  - Instant ticket search and sorting (`Soonest First`, `Furthest First`, `Highest Amount`)
   - Tabbed reservation management: `All`, `Upcoming`, `Past`, and `Cancelled`
-  - Ticket cards with poster thumbnails, formatted dates, booked tiers, and total PKR paid
-  - Digital Ticket Pass receipt modal displaying venue check-in details
-  - Self-service cancellation with instant capacity release
-- **Organizer Attendee Rosters & Live Dashboard Sync**:
-  - Real-time `totalBookings` and `ticketsSold` synchronization in `Dashboard.jsx`
-  - "Attendees" modal in `MyEvents.jsx` displaying full attendee rosters (names, emails, phones, booked tiers, and references)
+  - **Boarding Pass Digital Ticket Modal (`TicketPass.jsx`)**: Printable pass with simulated barcode, reference tag, and print-optimized layout
+  - **Structured Cancellation Modal (`CancelBookingModal.jsx`)**: Reason tracking with instant capacity restoration
+- **Organizer Attendee Roster Tools (`MyEvents.jsx`)**:
+  - Live attendee roster modal with total revenue, confirmed bookings, and tickets sold
+  - Instant text search across attendee name, email, phone, and booking reference
+  - Ticket tier filter dropdown
+  - **CSV Export Engine**: One-click download of `<event-name>_attendees.csv` with complete attendee contact and ticket records
+- **Global Toast Notification System (`ToastContext.jsx`, `Toast.jsx`)**:
+  - Non-blocking feedback for booking confirmations, calendar downloads, link copies, and cancellations
 
 ---
 
@@ -113,20 +120,21 @@ Module 3 delivers a complete end-to-end event discovery marketplace and attendee
 OnGo/
 ├── client/                      # React frontend
 │   ├── src/
-│   │   ├── components/          # Button, Card, Navbar, ProtectedRoute, EventForm, EventCard, CheckoutModal
-│   │   ├── context/             # AuthContext & useAuth hook
+│   │   ├── components/          # Button, Card, Navbar, ProtectedRoute, EventForm, EventCard,
+│   │   │                        # CheckoutModal, TicketPass, CancelBookingModal, Toast
+│   │   ├── context/             # AuthContext, ToastContext & hooks (useAuth, useToast)
 │   │   ├── layouts/             # RootLayout shell & footer
 │   │   ├── pages/
-│   │   │   ├── organizer/       # Dashboard, MyEvents (with Attendee Roster), CreateEvent, EditEvent
-│   │   │   ├── EventDetails.jsx # Public event details & interactive checkout modal
-│   │   │   ├── Explore.jsx      # Public event discovery marketplace with search & filters
+│   │   │   ├── organizer/       # Dashboard, MyEvents (with Search & CSV Roster Export), CreateEvent, EditEvent
+│   │   │   ├── EventDetails.jsx # Public event details, Similar Events, Calendar Export & Ticket Selector
+│   │   │   ├── Explore.jsx      # Public event discovery with price ranges & availability toggle
 │   │   │   ├── Home.jsx         # Marketplace discovery landing page with featured events
 │   │   │   ├── Login.jsx        # Login page
-│   │   │   ├── MyTickets.jsx    # Attendee dashboard & digital ticket pass hub
+│   │   │   ├── MyTickets.jsx    # Attendee dashboard with metrics, search & printable pass hub
 │   │   │   ├── Profile.jsx      # Protected user profile & live API check
 │   │   │   └── Register.jsx     # Registration page
 │   │   ├── services/            # API client service layer (auth + events + bookings)
-│   │   ├── App.jsx              # Router & route definitions
+│   │   ├── App.jsx              # Router & global ToastProvider wrapper
 │   │   ├── index.css            # Tailwind theme tokens & font imports
 │   │   └── main.jsx             # React DOM entry point
 │   ├── index.html
@@ -210,7 +218,7 @@ The Vite development server will start on `http://localhost:5173`.
 ### Event Discovery & Organizer Management (`/api/events`)
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `GET` | `/api/events` | Public | Discover published events with search, category, city, date & pagination |
+| `GET` | `/api/events` | Public | Discover published events with search, category, city, date, price ranges (`minPrice`, `maxPrice`), availability (`available`) & pagination |
 | `GET` | `/api/events/:id` | Public | Get single event details with populated organizer |
 | `POST` | `/api/events` | Protected | Create draft or published event with ticket tiers |
 | `GET` | `/api/events/organizer` | Protected | List organizer events with status filter & search |

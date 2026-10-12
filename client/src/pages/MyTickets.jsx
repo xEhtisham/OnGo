@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/Button';
 import { Card } from '../components/Card';
+import TicketPass from '../components/TicketPass';
 
 export default function MyTickets() {
   const [bookings, setBookings] = useState([]);
@@ -361,109 +362,10 @@ export default function MyTickets() {
 
       {/* Digital Ticket Pass Modal */}
       {activeTicketModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="relative bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-border space-y-6 animate-in fade-in zoom-in-95 duration-200">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <div>
-                <h3 className="text-lg font-extrabold text-text">Digital Ticket Pass</h3>
-                <p className="text-xs text-muted">Present this confirmation at venue check-in</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveTicketModal(null)}
-                className="p-1.5 rounded-full text-slate-400 hover:text-text hover:bg-slate-100 transition"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Ticket Card Aesthetic */}
-            <div className="rounded-2xl border-2 border-dashed border-primary/40 bg-indigo-50/40 p-5 space-y-4">
-              <div className="flex justify-between items-start gap-3">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-                    OnGo Verified Reservation
-                  </span>
-                  <h4 className="text-base font-extrabold text-text mt-0.5">
-                    {activeTicketModal.event?.title}
-                  </h4>
-                </div>
-                <span className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-sm">
-                  O
-                </span>
-              </div>
-
-              {/* Reference */}
-              <div className="p-3 bg-white rounded-xl border border-indigo-100 text-center space-y-1">
-                <span className="text-[10px] font-bold uppercase text-muted tracking-wider">
-                  Booking Reference
-                </span>
-                <div className="text-xl font-mono font-extrabold text-primary tracking-wider">
-                  {activeTicketModal.bookingReference}
-                </div>
-              </div>
-
-              {/* Details grid */}
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <span className="text-[10px] text-muted block uppercase font-bold">Attendee</span>
-                  <strong className="text-text">{activeTicketModal.attendeeDetails.fullName}</strong>
-                </div>
-                <div>
-                  <span className="text-[10px] text-muted block uppercase font-bold">Total Passes</span>
-                  <strong className="text-text">{activeTicketModal.totalTickets} ticket(s)</strong>
-                </div>
-                <div>
-                  <span className="text-[10px] text-muted block uppercase font-bold">Event Date</span>
-                  <strong className="text-text">
-                    {new Date(activeTicketModal.event?.date).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </strong>
-                </div>
-                <div>
-                  <span className="text-[10px] text-muted block uppercase font-bold">Time</span>
-                  <strong className="text-text">{activeTicketModal.event?.startTime}</strong>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-[10px] text-muted block uppercase font-bold">Venue</span>
-                  <strong className="text-text">
-                    {activeTicketModal.event?.venueName}, {activeTicketModal.event?.city}
-                  </strong>
-                </div>
-              </div>
-
-              {/* Tiers List */}
-              <div className="pt-3 border-t border-indigo-100 space-y-1">
-                <span className="text-[10px] text-muted block uppercase font-bold">
-                  Tier Breakdown
-                </span>
-                {activeTicketModal.tickets.map((t, idx) => (
-                  <div key={idx} className="flex justify-between text-xs">
-                    <span>
-                      {t.name} × {t.quantity}
-                    </span>
-                    <span className="font-bold text-text">
-                      PKR {(t.subtotal || t.price * t.quantity).toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Button
-              variant="outline"
-              size="md"
-              className="w-full"
-              onClick={() => setActiveTicketModal(null)}
-            >
-              Close Pass
-            </Button>
-          </div>
-        </div>
+        <TicketPass
+          booking={activeTicketModal}
+          onClose={() => setActiveTicketModal(null)}
+        />
       )}
     </div>
   );

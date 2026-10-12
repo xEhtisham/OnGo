@@ -42,6 +42,14 @@ const SORTS = [
   { label: 'Newly Added', value: 'newest' },
 ];
 
+const PRICE_PRESETS = [
+  { label: 'All Prices', min: '', max: '' },
+  { label: 'Free', min: '0', max: '0' },
+  { label: 'Under PKR 2,000', min: '0', max: '2000' },
+  { label: 'PKR 2K - 5K', min: '2000', max: '5000' },
+  { label: 'PKR 5,000+', min: '5000', max: '' },
+];
+
 export default function Explore() {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -52,12 +60,18 @@ export default function Explore() {
   const initialTimeframe = searchParams.get('timeframe') || 'upcoming';
   const initialSort = searchParams.get('sort') || 'date-asc';
   const initialPage = parseInt(searchParams.get('page') || '1', 10);
+  const initialMinPrice = searchParams.get('minPrice') || '';
+  const initialMaxPrice = searchParams.get('maxPrice') || '';
+  const initialAvailability = searchParams.get('availability') === 'available';
 
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedCity, setSelectedCity] = useState(initialCity);
   const [selectedTimeframe, setSelectedTimeframe] = useState(initialTimeframe);
   const [selectedSort, setSelectedSort] = useState(initialSort);
+  const [minPrice, setMinPrice] = useState(initialMinPrice);
+  const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
+  const [onlyAvailable, setOnlyAvailable] = useState(initialAvailability);
   const [currentPage, setCurrentPage] = useState(initialPage);
 
   const [events, setEvents] = useState([]);
@@ -82,6 +96,9 @@ export default function Explore() {
       if (selectedCategory !== 'All') params.category = selectedCategory;
       if (selectedCity !== 'All Cities') params.city = selectedCity;
       if (selectedTimeframe !== 'upcoming') params.timeframe = selectedTimeframe;
+      if (minPrice !== '') params.minPrice = minPrice;
+      if (maxPrice !== '') params.maxPrice = maxPrice;
+      if (onlyAvailable) params.availability = 'available';
 
       const response = await api.getPublicEvents(params);
 
@@ -95,6 +112,9 @@ export default function Explore() {
       if (selectedCategory !== 'All') newParams.set('category', selectedCategory);
       if (selectedCity !== 'All Cities') newParams.set('city', selectedCity);
       if (selectedTimeframe !== 'upcoming') newParams.set('timeframe', selectedTimeframe);
+      if (minPrice !== '') newParams.set('minPrice', minPrice);
+      if (maxPrice !== '') newParams.set('maxPrice', maxPrice);
+      if (onlyAvailable) newParams.set('availability', 'available');
       if (selectedSort !== 'date-asc') newParams.set('sort', selectedSort);
       if (currentPage > 1) newParams.set('page', currentPage.toString());
 
@@ -110,6 +130,9 @@ export default function Explore() {
     selectedCity,
     selectedTimeframe,
     selectedSort,
+    minPrice,
+    maxPrice,
+    onlyAvailable,
     currentPage,
     setSearchParams,
   ]);
@@ -122,7 +145,7 @@ export default function Explore() {
     return () => clearTimeout(timer);
   }, [fetchEvents]);
 
-  // Reset to page 1 whenever search, category, or city changes
+  // Reset to page 1 on filter changes
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
     setCurrentPage(1);
@@ -148,12 +171,26 @@ export default function Explore() {
     setCurrentPage(1);
   };
 
+  const handlePricePresetSelect = (preset) => {
+    setMinPrice(preset.min);
+    setMaxPrice(preset.max);
+    setCurrentPage(1);
+  };
+
+  const handleToggleAvailable = () => {
+    setOnlyAvailable((prev) => !prev);
+    setCurrentPage(1);
+  };
+
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedCategory('All');
     setSelectedCity('All Cities');
     setSelectedTimeframe('upcoming');
     setSelectedSort('date-asc');
+    setMinPrice('');
+    setMaxPrice('');
+    setOnlyAvailable(false);
     setCurrentPage(1);
   };
 
@@ -162,6 +199,9 @@ export default function Explore() {
     selectedCategory !== 'All' ||
     selectedCity !== 'All Cities' ||
     selectedTimeframe !== 'upcoming' ||
+    minPrice !== '' ||
+    maxPrice !== '' ||
+    onlyAvailable ||
     selectedSort !== 'date-asc';
 
   return (
@@ -282,6 +322,51 @@ export default function Explore() {
           })}
         </div>
 
+        {/* Price Presets & Availability Filter Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
+          {/* Price Presets */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none text-xs">
+            <span className="text-muted font-bold mr-1 text-[11px] uppercase tracking-wider">
+              Price:
+            </span>
+            {PRICE_PRESETS.map((preset, idx) => {
+              const isActive = minPrice === preset.min && maxPrice === preset.max;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handlePricePresetSelect(preset)}
+                  className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                    isActive
+                      ? 'bg-slate-900 text-white font-bold'
+                      : 'bg-slate-100 text-muted hover:text-text hover:bg-slate-200'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Availability Toggle */}
+          <button
+            type="button"
+            onClick={handleToggleAvailable}
+            className={`flex-shrink-0 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
+              onlyAvailable
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : 'bg-slate-50 text-muted border-border hover:bg-slate-100'
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                onlyAvailable ? 'bg-emerald-500' : 'bg-slate-300'
+              }`}
+            />
+            <span>Available Tickets Only</span>
+          </button>
+        </div>
+
         {/* Active Filters Summary */}
         {hasActiveFilters && (
           <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-muted">
@@ -300,6 +385,17 @@ export default function Explore() {
               {selectedTimeframe !== 'upcoming' && (
                 <span className="px-2 py-0.5 rounded bg-slate-100 text-text font-medium">
                   {TIMEFRAMES.find((t) => t.value === selectedTimeframe)?.label}
+                </span>
+              )}
+              {(minPrice !== '' || maxPrice !== '') && (
+                <span className="px-2 py-0.5 rounded bg-slate-100 text-text font-medium">
+                  Price: {minPrice ? `PKR ${minPrice}` : 'PKR 0'} -{' '}
+                  {maxPrice ? `PKR ${maxPrice}` : '∞'}
+                </span>
+              )}
+              {onlyAvailable && (
+                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium">
+                  In Stock Only
                 </span>
               )}
               {searchQuery.trim() && (
@@ -370,7 +466,7 @@ export default function Explore() {
             <h3 className="text-lg font-bold text-text">No events match your search</h3>
             <p className="text-sm text-muted">
               We couldn't find any events with the current filters. Try adjusting your search
-              keywords, selecting "All Categories", or expanding your city selection.
+              keywords, price filters, or expanding your city selection.
             </p>
           </div>
           {hasActiveFilters && (

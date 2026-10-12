@@ -70,6 +70,9 @@ export const api = {
     if (params.city && params.city !== 'All') query.append('city', params.city);
     if (params.timeframe) query.append('timeframe', params.timeframe);
     if (params.date) query.append('date', params.date);
+    if (params.minPrice !== undefined && params.minPrice !== '') query.append('minPrice', params.minPrice);
+    if (params.maxPrice !== undefined && params.maxPrice !== '') query.append('maxPrice', params.maxPrice);
+    if (params.availability) query.append('availability', params.availability);
     if (params.sort) query.append('sort', params.sort);
     if (params.page) query.append('page', params.page);
     if (params.limit) query.append('limit', params.limit);

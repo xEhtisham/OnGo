@@ -91,14 +91,23 @@ export async function getPublicEvents(req, res, next) {
       city,
       timeframe,
       date,
+      minPrice,
+      maxPrice,
+      availability,
       sort = 'date-asc',
       page = 1,
       limit = 12,
     } = req.query;
 
-    const query = {
-      status: { $in: ['Published', 'Sold Out'] },
-    };
+    const query = {};
+
+    // Availability filter
+    if (availability === 'available') {
+      query.status = 'Published';
+      query.bookingStatus = 'Open';
+    } else {
+      query.status = { $in: ['Published', 'Sold Out'] };
+    }
 
     // Category filter
     if (category && category !== 'All') {
@@ -108,6 +117,23 @@ export async function getPublicEvents(req, res, next) {
     // City filter (case-insensitive)
     if (city && city !== 'All') {
       query.city = new RegExp(`^${city.trim()}$`, 'i');
+    }
+
+    // Price range filter across ticket tiers
+    if (
+      (minPrice !== undefined && minPrice !== '') ||
+      (maxPrice !== undefined && maxPrice !== '')
+    ) {
+      const priceFilter = {};
+      if (minPrice !== undefined && minPrice !== '') {
+        priceFilter.$gte = Number(minPrice);
+      }
+      if (maxPrice !== undefined && maxPrice !== '') {
+        priceFilter.$lte = Number(maxPrice);
+      }
+      query.ticketTypes = {
+        $elemMatch: { price: priceFilter },
+      };
     }
 
     // Text search across title, description, venueName, and city

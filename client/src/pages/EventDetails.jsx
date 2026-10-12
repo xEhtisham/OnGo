@@ -5,6 +5,7 @@ import api from '../services/api';
 import Button from '../components/Button';
 import { Card, CardTitle, CardDescription } from '../components/Card';
 import CheckoutModal from '../components/CheckoutModal';
+import EventCard from '../components/EventCard';
 
 export default function EventDetails() {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export default function EventDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [similarEvents, setSimilarEvents] = useState([]);
 
   // Selected quantities for each ticket type: { [ticketId]: quantity }
   const [selectedQuantities, setSelectedQuantities] = useState({});
@@ -23,16 +25,32 @@ export default function EventDetails() {
       try {
         setLoading(true);
         setError('');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         const response = await api.getEventById(id);
         if (response?.data?.event) {
-          setEvent(response.data.event);
+          const loadedEvent = response.data.event;
+          setEvent(loadedEvent);
 
           // Initialize selected quantities
           const initial = {};
-          response.data.event.ticketTypes?.forEach((t) => {
+          loadedEvent.ticketTypes?.forEach((t) => {
             initial[t._id] = 0;
           });
           setSelectedQuantities(initial);
+
+          // Fetch similar events in the same category
+          try {
+            const similarRes = await api.getPublicEvents({
+              category: loadedEvent.category,
+              limit: 4,
+            });
+            const matches = (similarRes?.data?.events || []).filter(
+              (e) => e._id !== loadedEvent._id
+            );
+            setSimilarEvents(matches.slice(0, 3));
+          } catch (simErr) {
+            console.error('Failed to load similar events', simErr);
+          }
         } else {
           setError('Event not found.');
         }
@@ -459,6 +477,38 @@ export default function EventDetails() {
           </Card>
         </div>
       </div>
+
+      {/* Similar Events Discovery Section */}
+      {similarEvents.length > 0 && (
+        <section className="pt-12 mt-12 border-t border-border space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">✨</span>
+                <h2 className="text-2xl font-extrabold text-text tracking-tight">
+                  Similar Events You Might Like
+                </h2>
+              </div>
+              <p className="text-sm text-muted mt-1">
+                More top-rated experiences in <strong className="text-text">{event.category}</strong>
+              </p>
+            </div>
+            <Link
+              to={`/explore?category=${encodeURIComponent(event.category)}`}
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-dark transition group"
+            >
+              <span>Explore all {event.category}</span>
+              <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {similarEvents.map((simEvent) => (
+              <EventCard key={simEvent._id} event={simEvent} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Checkout & Reservation Modal */}
       <CheckoutModal

@@ -52,19 +52,51 @@ export default function MyTickets() {
     }
   };
 
-  // Filter bookings according to active tab
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('date-asc');
+
+  // Overview metrics calculations
   const now = new Date();
-  const filteredBookings = bookings.filter((b) => {
-    if (activeTab === 'All') return true;
-    if (activeTab === 'Cancelled') return b.status === 'Cancelled';
-    const eventDate = b.event?.date ? new Date(b.event.date) : null;
-    if (activeTab === 'Upcoming') {
-      return b.status === 'Confirmed' && eventDate && eventDate >= now;
+  const confirmedBookings = bookings.filter((b) => b.status === 'Confirmed');
+  const upcomingCount = confirmedBookings.filter(
+    (b) => b.event?.date && new Date(b.event.date) >= now
+  ).length;
+  const totalPasses = confirmedBookings.reduce((sum, b) => sum + (b.totalTickets || 0), 0);
+  const totalSpent = confirmedBookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+
+  // Filter & sort bookings
+  let filteredBookings = bookings.filter((b) => {
+    if (activeTab === 'Cancelled') {
+      if (b.status !== 'Cancelled') return false;
+    } else if (activeTab === 'Upcoming') {
+      const eventDate = b.event?.date ? new Date(b.event.date) : null;
+      if (b.status !== 'Confirmed' || !eventDate || eventDate < now) return false;
+    } else if (activeTab === 'Past') {
+      const eventDate = b.event?.date ? new Date(b.event.date) : null;
+      if (b.status !== 'Confirmed' || !eventDate || eventDate >= now) return false;
     }
-    if (activeTab === 'Past') {
-      return b.status === 'Confirmed' && eventDate && eventDate < now;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchTitle = b.event?.title?.toLowerCase().includes(q);
+      const matchRef = b.bookingReference?.toLowerCase().includes(q);
+      const matchVenue = b.event?.venueName?.toLowerCase().includes(q);
+      const matchCity = b.event?.city?.toLowerCase().includes(q);
+      if (!matchTitle && !matchRef && !matchVenue && !matchCity) return false;
     }
+
     return true;
+  });
+
+  // Sort bookings
+  filteredBookings.sort((a, b) => {
+    if (sortOrder === 'date-asc') {
+      return new Date(a.event?.date || 0) - new Date(b.event?.date || 0);
+    }
+    if (sortOrder === 'date-desc') {
+      return new Date(b.event?.date || 0) - new Date(a.event?.date || 0);
+    }
+    return new Date(b.createdAt) - new Date(a.createdAt);
   });
 
   return (
@@ -88,18 +120,106 @@ export default function MyTickets() {
         </Link>
       </div>
 
+      {/* Attendee Overview Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-5 bg-white rounded-2xl border border-border shadow-sm flex items-center justify-between">
+          <div>
+            <span className="text-xs font-bold text-muted uppercase tracking-wider block">
+              Upcoming Events
+            </span>
+            <span className="text-2xl font-extrabold text-primary mt-1 block">
+              {upcomingCount}
+            </span>
+            <span className="text-[11px] text-muted">Confirmed experiences</span>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl">
+            📅
+          </div>
+        </div>
+
+        <div className="p-5 bg-white rounded-2xl border border-border shadow-sm flex items-center justify-between">
+          <div>
+            <span className="text-xs font-bold text-muted uppercase tracking-wider block">
+              Passes Reserved
+            </span>
+            <span className="text-2xl font-extrabold text-text mt-1 block">
+              {totalPasses}
+            </span>
+            <span className="text-[11px] text-muted">Total active tickets</span>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl">
+            🎟️
+          </div>
+        </div>
+
+        <div className="p-5 bg-white rounded-2xl border border-border shadow-sm flex items-center justify-between">
+          <div>
+            <span className="text-xs font-bold text-muted uppercase tracking-wider block">
+              Total Invested
+            </span>
+            <span className="text-2xl font-extrabold text-text mt-1 block">
+              PKR {totalSpent.toLocaleString()}
+            </span>
+            <span className="text-[11px] text-muted">All confirmed bookings</span>
+          </div>
+          <div className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl">
+            💎
+          </div>
+        </div>
+      </div>
+
+      {/* Search & Sort Controls Bar */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-white p-3.5 rounded-2xl border border-border shadow-sm">
+        {/* Search */}
+        <div className="relative w-full sm:w-80">
+          <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search tickets by title, city, or OG-code..."
+            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-text text-xs"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Sort dropdown */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <span className="text-xs text-muted font-bold flex-shrink-0">Sort:</span>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="w-full sm:w-auto px-3 py-2 text-xs rounded-xl border border-border bg-white text-text font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+          >
+            <option value="date-asc">Event Date (Soonest First)</option>
+            <option value="date-desc">Event Date (Latest First)</option>
+            <option value="booking-desc">Booking Date (Most Recent)</option>
+          </select>
+        </div>
+      </div>
+
       {/* Tabs */}
       <div className="flex items-center gap-2 border-b border-border pb-3 overflow-x-auto scrollbar-none">
         {['All', 'Upcoming', 'Past', 'Cancelled'].map((tab) => {
           const isActive = activeTab === tab;
           let count = bookings.length;
           if (tab === 'Upcoming') {
-            count = bookings.filter(
-              (b) => b.status === 'Confirmed' && b.event?.date && new Date(b.event.date) >= now
-            ).length;
+            count = upcomingCount;
           } else if (tab === 'Past') {
-            count = bookings.filter(
-              (b) => b.status === 'Confirmed' && b.event?.date && new Date(b.event.date) < now
+            count = confirmedBookings.filter(
+              (b) => b.event?.date && new Date(b.event.date) < now
             ).length;
           } else if (tab === 'Cancelled') {
             count = bookings.filter((b) => b.status === 'Cancelled').length;

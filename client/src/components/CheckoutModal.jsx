@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 import Button from './Button';
 
@@ -14,6 +15,7 @@ export default function CheckoutModal({
   onBookingSuccess,
 }) {
   const { user, isAuthenticated } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
 
   const [fullName, setFullName] = useState(user?.name || '');
@@ -49,6 +51,7 @@ export default function CheckoutModal({
     if (confirmedBooking?.bookingReference) {
       navigator.clipboard.writeText(confirmedBooking.bookingReference);
       setCopied(true);
+      toast.info('Booking reference copied to clipboard!');
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -56,6 +59,7 @@ export default function CheckoutModal({
   const handleSubmitBooking = async (e) => {
     e.preventDefault();
     if (!isAuthenticated) {
+      toast.info('Please log in to finalize your booking.');
       navigate('/login');
       return;
     }
@@ -85,12 +89,15 @@ export default function CheckoutModal({
       const res = await api.createBooking(payload);
       if (res?.data?.booking) {
         setConfirmedBooking(res.data.booking);
+        toast.success(`Reservation confirmed! Reference: ${res.data.booking.bookingReference}`);
         if (onBookingSuccess) {
           onBookingSuccess(res.data.booking);
         }
       }
     } catch (err) {
-      setError(err.message || 'Failed to complete booking. Please try again.');
+      const errMsg = err.message || 'Failed to complete booking. Please try again.';
+      setError(errMsg);
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 import Button from '../components/Button';
 import { Card, CardTitle, CardDescription } from '../components/Card';
@@ -10,6 +11,7 @@ import EventCard from '../components/EventCard';
 export default function EventDetails() {
   const { id } = useParams();
   const { user } = useAuth();
+  const toast = useToast();
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -165,6 +167,7 @@ export default function EventDetails() {
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setLinkCopied(true);
+    toast.info('Event link copied to clipboard!');
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
@@ -193,6 +196,8 @@ export default function EventDetails() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Calendar event (.ics) downloaded!');
   };
 
   return (

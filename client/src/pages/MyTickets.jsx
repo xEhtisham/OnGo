@@ -5,8 +5,10 @@ import Button from '../components/Button';
 import { Card } from '../components/Card';
 import TicketPass from '../components/TicketPass';
 import CancelBookingModal from '../components/CancelBookingModal';
+import { useToast } from '../context/ToastContext';
 
 export default function MyTickets() {
+  const toast = useToast();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -36,6 +38,7 @@ export default function MyTickets() {
   const handleCopy = (ref) => {
     navigator.clipboard.writeText(ref);
     setCopiedRef(ref);
+    toast.info('Booking reference copied to clipboard!');
     setTimeout(() => setCopiedRef(null), 2000);
   };
 
@@ -44,9 +47,10 @@ export default function MyTickets() {
       setIsCancelling(true);
       await api.cancelBooking(bookingId, reason);
       setCancelModalBooking(null);
+      toast.success('Reservation cancelled successfully.');
       await fetchBookings();
     } catch (err) {
-      alert(err.message || 'Failed to cancel reservation');
+      toast.error(err.message || 'Failed to cancel reservation');
     } finally {
       setIsCancelling(false);
     }

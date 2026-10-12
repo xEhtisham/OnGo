@@ -34,9 +34,13 @@ export default function MyEvents() {
   const [eventAttendees, setEventAttendees] = useState([]);
   const [loadingAttendees, setLoadingAttendees] = useState(false);
   const [attendeeError, setAttendeeError] = useState('');
+  const [attendeeSearch, setAttendeeSearch] = useState('');
+  const [attendeeTierFilter, setAttendeeTierFilter] = useState('All');
 
   const handleOpenAttendees = async (event) => {
     setAttendeeModalEvent(event);
+    setAttendeeSearch('');
+    setAttendeeTierFilter('All');
     try {
       setLoadingAttendees(true);
       setAttendeeError('');
@@ -47,6 +51,44 @@ export default function MyEvents() {
     } finally {
       setLoadingAttendees(false);
     }
+  };
+
+  const handleExportCSV = () => {
+    if (!eventAttendees.length || !attendeeModalEvent) return;
+
+    const headers = ['Booking Reference', 'Attendee Name', 'Email', 'Phone', 'Tickets', 'Total PKR', 'Status', 'Booking Date'];
+    const rows = eventAttendees.map((b) => {
+      const name = b.attendeeDetails?.fullName || b.user?.name || 'Attendee';
+      const email = b.attendeeDetails?.email || b.user?.email || '';
+      const phone = b.attendeeDetails?.phone || '';
+      const tickets = (b.tickets || []).map((t) => `${t.name} (x${t.quantity})`).join('; ');
+      const amount = b.totalAmount || 0;
+      const status = b.status || 'confirmed';
+      const date = b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '';
+
+      return [
+        `"${b.bookingReference || ''}"`,
+        `"${name.replace(/"/g, '""')}"`,
+        `"${email.replace(/"/g, '""')}"`,
+        `"${phone.replace(/"/g, '""')}"`,
+        `"${tickets.replace(/"/g, '""')}"`,
+        amount,
+        `"${status}"`,
+        `"${date}"`,
+      ].join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const safeTitle = attendeeModalEvent.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${safeTitle}_attendees.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const fetchEvents = useCallback(async () => {
@@ -402,108 +444,207 @@ export default function MyEvents() {
       )}
 
       {/* Attendee Roster Modal */}
-      {attendeeModalEvent && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="relative bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-border space-y-6 animate-in fade-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <div>
-                <h3 className="text-xl font-extrabold text-text">Attendee Roster</h3>
-                <p className="text-xs text-muted mt-0.5">{attendeeModalEvent.title}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setAttendeeModalEvent(null)}
-                className="p-1.5 rounded-full text-slate-400 hover:text-text hover:bg-slate-100 transition"
-              >
-                ✕
-              </button>
-            </div>
+      {attendeeModalEvent && (() => {
+        const rosterTiers = ['All', ...new Set(eventAttendees.flatMap((b) => (b.tickets || []).map((t) => t.name)))];
+        const filteredAttendees = eventAttendees.filter((b) => {
+          const q = attendeeSearch.trim().toLowerCase();
+          const name = (b.attendeeDetails?.fullName || b.user?.name || '').toLowerCase();
+          const email = (b.attendeeDetails?.email || b.user?.email || '').toLowerCase();
+          const ref = (b.bookingReference || '').toLowerCase();
+          const phone = (b.attendeeDetails?.phone || '').toLowerCase();
 
-            {/* Quick Metrics */}
-            <div className="grid grid-cols-2 gap-3 text-center">
-              <div className="p-3 bg-slate-50 rounded-2xl border border-border">
-                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
-                  Confirmed Bookings
-                </span>
-                <span className="text-xl font-extrabold text-primary">
-                  {eventAttendees.length}
-                </span>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-2xl border border-border">
-                <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
-                  Tickets Reserved
-                </span>
-                <span className="text-xl font-extrabold text-text">
-                  {eventAttendees.reduce((sum, b) => sum + (b.totalTickets || 0), 0)}
-                </span>
-              </div>
-            </div>
+          const matchesSearch = !q || name.includes(q) || email.includes(q) || ref.includes(q) || phone.includes(q);
+          const matchesTier = attendeeTierFilter === 'All' || (b.tickets || []).some((t) => t.name === attendeeTierFilter);
 
-            {/* Body */}
-            {loadingAttendees ? (
-              <div className="py-12 flex flex-col items-center justify-center gap-2">
-                <div className="w-7 h-7 border-3 border-primary border-t-transparent rounded-full animate-spin" />
-                <p className="text-xs text-muted">Loading attendee list...</p>
-              </div>
-            ) : attendeeError ? (
-              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
-                {attendeeError}
-              </div>
-            ) : eventAttendees.length === 0 ? (
-              <div className="py-12 text-center space-y-2">
-                <span className="text-3xl">👥</span>
-                <h4 className="text-sm font-bold text-text">No attendees yet</h4>
-                <p className="text-xs text-muted max-w-xs mx-auto">
-                  When attendees reserve tickets for this event, their contact information and booking references will appear here.
-                </p>
-              </div>
-            ) : (
-              <div className="max-h-80 overflow-y-auto space-y-3 pr-1">
-                {eventAttendees.map((booking) => (
-                  <div
-                    key={booking._id}
-                    className="p-3.5 bg-slate-50/70 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+          return matchesSearch && matchesTier;
+        });
+
+        return (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="relative bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-border space-y-5 animate-in fade-in zoom-in-95 duration-200">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-border gap-3">
+                <div>
+                  <h3 className="text-xl font-extrabold text-text">Attendee Roster</h3>
+                  <p className="text-xs text-muted mt-0.5">{attendeeModalEvent.title}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {eventAttendees.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleExportCSV}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold transition shadow-sm"
+                      title="Export attendee list as CSV"
+                    >
+                      <span>📥</span>
+                      <span>Export CSV</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setAttendeeModalEvent(null)}
+                    className="p-1.5 rounded-full text-slate-400 hover:text-text hover:bg-slate-100 transition"
                   >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <strong className="text-text font-bold text-sm">
-                          {booking.attendeeDetails?.fullName || booking.user?.name || 'Attendee'}
-                        </strong>
-                        <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-mono text-[10px] font-bold">
-                          {booking.bookingReference}
-                        </span>
-                      </div>
-                      <p className="text-muted text-[11px]">
-                        {booking.attendeeDetails?.email || booking.user?.email}{' '}
-                        {booking.attendeeDetails?.phone ? `• ${booking.attendeeDetails.phone}` : ''}
-                      </p>
-                    </div>
-
-                    <div className="sm:text-right space-y-0.5 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200">
-                      <div className="font-semibold text-text">
-                        {booking.tickets?.map((t) => `${t.name} (×${t.quantity})`).join(', ')}
-                      </div>
-                      <div className="text-[11px] text-muted font-bold text-primary">
-                        PKR {booking.totalAmount?.toLocaleString()}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    ✕
+                  </button>
+                </div>
               </div>
-            )}
 
-            <Button
-              variant="outline"
-              size="md"
-              className="w-full"
-              onClick={() => setAttendeeModalEvent(null)}
-            >
-              Close Roster
-            </Button>
+              {/* Quick Metrics */}
+              <div className="grid grid-cols-3 gap-2.5 text-center">
+                <div className="p-2.5 bg-slate-50 rounded-2xl border border-border">
+                  <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                    Confirmed
+                  </span>
+                  <span className="text-lg font-extrabold text-primary">
+                    {eventAttendees.length}
+                  </span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-2xl border border-border">
+                  <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                    Tickets
+                  </span>
+                  <span className="text-lg font-extrabold text-text">
+                    {eventAttendees.reduce((sum, b) => sum + (b.totalTickets || 0), 0)}
+                  </span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-2xl border border-border">
+                  <span className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                    Total Revenue
+                  </span>
+                  <span className="text-lg font-extrabold text-emerald-600">
+                    PKR {eventAttendees.reduce((sum, b) => sum + (b.totalAmount || 0), 0).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Filter Toolbar inside Modal */}
+              {eventAttendees.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 pt-1">
+                  <div className="sm:col-span-8 relative">
+                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted text-xs">
+                      🔍
+                    </span>
+                    <input
+                      type="text"
+                      value={attendeeSearch}
+                      onChange={(e) => setAttendeeSearch(e.target.value)}
+                      placeholder="Search by name, email, phone, or reference..."
+                      className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-border bg-slate-50 text-text focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-slate-400"
+                    />
+                    {attendeeSearch && (
+                      <button
+                        onClick={() => setAttendeeSearch('')}
+                        className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-muted hover:text-text text-xs"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                  <div className="sm:col-span-4">
+                    <select
+                      value={attendeeTierFilter}
+                      onChange={(e) => setAttendeeTierFilter(e.target.value)}
+                      className="w-full px-2.5 py-2 text-xs rounded-xl border border-border bg-slate-50 text-text font-medium focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="All">All Tiers ({eventAttendees.length})</option>
+                      {rosterTiers.filter((t) => t !== 'All').map((t) => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Body */}
+              {loadingAttendees ? (
+                <div className="py-12 flex flex-col items-center justify-center gap-2">
+                  <div className="w-7 h-7 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+                  <p className="text-xs text-muted">Loading attendee list...</p>
+                </div>
+              ) : attendeeError ? (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+                  {attendeeError}
+                </div>
+              ) : eventAttendees.length === 0 ? (
+                <div className="py-12 text-center space-y-2">
+                  <span className="text-3xl">👥</span>
+                  <h4 className="text-sm font-bold text-text">No attendees yet</h4>
+                  <p className="text-xs text-muted max-w-xs mx-auto">
+                    When attendees reserve tickets for this event, their contact information and booking references will appear here.
+                  </p>
+                </div>
+              ) : filteredAttendees.length === 0 ? (
+                <div className="py-10 text-center space-y-2">
+                  <span className="text-2xl">🔍</span>
+                  <h4 className="text-sm font-bold text-text">No matching attendees</h4>
+                  <p className="text-xs text-muted">
+                    No attendees match your current search query or tier filter.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setAttendeeSearch('');
+                      setAttendeeTierFilter('All');
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-[11px] text-muted font-bold px-1">
+                    <span>Showing {filteredAttendees.length} of {eventAttendees.length} attendees</span>
+                    {attendeeTierFilter !== 'All' && <span>Tier: {attendeeTierFilter}</span>}
+                  </div>
+                  <div className="max-h-80 overflow-y-auto space-y-3 pr-1">
+                    {filteredAttendees.map((booking) => (
+                      <div
+                        key={booking._id}
+                        className="p-3.5 bg-slate-50/70 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <strong className="text-text font-bold text-sm">
+                              {booking.attendeeDetails?.fullName || booking.user?.name || 'Attendee'}
+                            </strong>
+                            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-mono text-[10px] font-bold">
+                              {booking.bookingReference}
+                            </span>
+                          </div>
+                          <p className="text-muted text-[11px]">
+                            {booking.attendeeDetails?.email || booking.user?.email}{' '}
+                            {booking.attendeeDetails?.phone ? `• ${booking.attendeeDetails.phone}` : ''}
+                          </p>
+                        </div>
+
+                        <div className="sm:text-right space-y-0.5 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200">
+                          <div className="font-semibold text-text">
+                            {booking.tickets?.map((t) => `${t.name} (×${t.quantity})`).join(', ')}
+                          </div>
+                          <div className="text-[11px] text-muted font-bold text-primary">
+                            PKR {booking.totalAmount?.toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <Button
+                variant="outline"
+                size="md"
+                className="w-full"
+                onClick={() => setAttendeeModalEvent(null)}
+              >
+                Close Roster
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

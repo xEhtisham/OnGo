@@ -142,6 +142,41 @@ export default function EventDetails() {
     }
   };
 
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const handleDownloadICS = () => {
+    if (!event) return;
+    const startDate = new Date(event.date);
+    const icsData = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//OnGo Events//PK',
+      'BEGIN:VEVENT',
+      `SUMMARY:${event.title}`,
+      `DESCRIPTION:${event.description?.replace(/\n/g, ' ') || ''}`,
+      `LOCATION:${event.venueName}, ${event.city}`,
+      `DTSTART:${startDate.toISOString().replace(/-|:|\.\d+/g, '')}`,
+      'STATUS:CONFIRMED',
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+
+    const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${event.title.replace(/\s+/g, '_')}.ics`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Organizer Shortcut Banner */}
@@ -255,6 +290,39 @@ export default function EventDetails() {
               </div>
             </div>
           </Card>
+
+          {/* Share & Calendar Export Card */}
+          <Card className="border-border">
+            <CardTitle className="text-base">Share & Calendar</CardTitle>
+            <div className="mt-3 flex flex-wrap gap-2.5">
+              <button
+                type="button"
+                onClick={handleDownloadICS}
+                className="px-3.5 py-2 rounded-xl border border-border bg-slate-50 hover:bg-slate-100 text-text font-bold text-xs flex items-center gap-1.5 transition"
+              >
+                <span>📅 Add to Calendar (.ics)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="px-3.5 py-2 rounded-xl border border-border bg-slate-50 hover:bg-slate-100 text-text font-bold text-xs flex items-center gap-1.5 transition"
+              >
+                <span>{linkCopied ? '✓ Link Copied!' : '🔗 Copy Event Link'}</span>
+              </button>
+
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                  `Check out "${event.title}" on OnGo: ${window.location.href}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-2 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1.5 transition"
+              >
+                <span>💬 WhatsApp</span>
+              </a>
+            </div>
+          </Card>
         </div>
 
         {/* Right Column: Interactive Ticket Selection Widget */}
@@ -294,7 +362,7 @@ export default function EventDetails() {
                           {isSoldOut ? (
                             <span className="text-error font-bold">Sold Out</span>
                           ) : (
-                            <span>{remaining} tickets available</span>
+                            <span>{remaining} of {ticket.capacity} tickets remaining</span>
                           )}
                         </p>
                       </div>
@@ -304,6 +372,21 @@ export default function EventDetails() {
                           PKR {Number(ticket.price).toLocaleString()}
                         </span>
                       </div>
+                    </div>
+
+                    {/* Tier Inventory Progress Meter */}
+                    <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          isSoldOut ? 'bg-rose-500' : 'bg-primary'
+                        }`}
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            Math.round(((ticket.sold || 0) / (ticket.capacity || 1)) * 100)
+                          )}%`,
+                        }}
+                      />
                     </div>
 
                     {/* Quantity Selector Counter */}

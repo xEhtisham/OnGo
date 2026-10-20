@@ -2,18 +2,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import EventCard from '../components/EventCard';
-import Button from '../components/Button';
 
 const CATEGORIES = [
-  'All',
-  'Music',
-  'Sports',
-  'Food & Drink',
-  'Arts & Culture',
-  'Business',
-  'Education',
-  'Technology',
-  'Other',
+  { name: 'All', icon: '✨' },
+  { name: 'Music', icon: '🎵' },
+  { name: 'Sports', icon: '⚽' },
+  { name: 'Food & Drink', icon: '🍽️' },
+  { name: 'Arts & Culture', icon: '🎭' },
+  { name: 'Business', icon: '💼' },
+  { name: 'Education', icon: '📚' },
+  { name: 'Technology', icon: '💻' },
+  { name: 'Other', icon: '🎪' },
 ];
 
 const CITIES = [
@@ -208,46 +207,40 @@ export default function Explore() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8">
       {/* Header */}
       <div className="space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-          Marketplace Discovery
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-lowest text-primary-container text-xs font-bold uppercase tracking-wider border border-surface-container shadow-xs">
+          <span className="material-symbols-outlined text-[16px]">explore</span>
+          <span>Marketplace Discovery</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-text tracking-tight">
-          Explore Events in Pakistan
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-on-surface tracking-tight">
+          Explore Live Experiences
         </h1>
-        <p className="text-base sm:text-lg text-muted max-w-2xl">
+        <p className="text-sm sm:text-base text-on-surface-variant max-w-2xl leading-relaxed">
           Browse upcoming concerts, tech summits, cultural exhibitions, and community festivals.
           Find your next experience and reserve tickets instantly.
         </p>
       </div>
 
       {/* Search & Filter Hub */}
-      <div className="bg-white rounded-2xl border border-border p-5 sm:p-6 shadow-sm space-y-5">
+      <div className="bg-surface-container-lowest rounded-3xl border border-surface-container p-5 sm:p-6 shadow-xs space-y-5">
         {/* Search bar & dropdowns row */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4">
           {/* Keyword Search */}
           <div className="md:col-span-5 relative">
-            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-outline">
+              <span className="material-symbols-outlined text-[20px]">search</span>
             </span>
             <input
               type="text"
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search by title, venue, or artist..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border text-sm text-text placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-container bg-surface-container-low/50 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-text"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface"
                 title="Clear search"
               >
                 ✕
@@ -260,7 +253,7 @@ export default function Explore() {
             <select
               value={selectedCity}
               onChange={handleCityChange}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm text-text font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-surface-container bg-surface-container-low/50 text-sm text-on-surface font-semibold focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition cursor-pointer"
             >
               {CITIES.map((city) => (
                 <option key={city} value={city}>
@@ -275,7 +268,7 @@ export default function Explore() {
             <select
               value={selectedTimeframe}
               onChange={handleTimeframeChange}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm text-text font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-surface-container bg-surface-container-low/50 text-sm text-on-surface font-semibold focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition cursor-pointer"
             >
               {TIMEFRAMES.map((tf) => (
                 <option key={tf.value} value={tf.value}>
@@ -290,7 +283,7 @@ export default function Explore() {
             <select
               value={selectedSort}
               onChange={handleSortChange}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm text-text font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-surface-container bg-surface-container-low/50 text-sm text-on-surface font-semibold focus:outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition cursor-pointer"
             >
               {SORTS.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -304,30 +297,31 @@ export default function Explore() {
         {/* Category Pills Bar */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 scrollbar-none">
           {CATEGORIES.map((cat) => {
-            const isActive = selectedCategory === cat;
+            const isActive = selectedCategory === cat.name;
             return (
               <button
-                key={cat}
+                key={cat.name}
                 type="button"
-                onClick={() => handleCategorySelect(cat)}
-                className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                onClick={() => handleCategorySelect(cat.name)}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
                   isActive
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'bg-slate-100 text-muted hover:text-text hover:bg-slate-200'
+                    ? 'bg-primary-container text-white shadow-xs'
+                    : 'bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface'
                 }`}
               >
-                {cat}
+                <span>{cat.icon}</span>
+                <span>{cat.name}</span>
               </button>
             );
           })}
         </div>
 
         {/* Price Presets & Availability Filter Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-surface-container">
           {/* Price Presets */}
           <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none text-xs">
-            <span className="text-muted font-bold mr-1 text-[11px] uppercase tracking-wider">
-              Price:
+            <span className="text-outline font-bold mr-1 text-[11px] uppercase tracking-wider">
+              Price Range:
             </span>
             {PRICE_PRESETS.map((preset, idx) => {
               const isActive = minPrice === preset.min && maxPrice === preset.max;
@@ -336,10 +330,10 @@ export default function Explore() {
                   key={idx}
                   type="button"
                   onClick={() => handlePricePresetSelect(preset)}
-                  className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                  className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
                     isActive
-                      ? 'bg-slate-900 text-white font-bold'
-                      : 'bg-slate-100 text-muted hover:text-text hover:bg-slate-200'
+                      ? 'bg-primary-container text-white shadow-xs'
+                      : 'bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
                   }`}
                 >
                   {preset.label}
@@ -354,13 +348,13 @@ export default function Explore() {
             onClick={handleToggleAvailable}
             className={`flex-shrink-0 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
               onlyAvailable
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                : 'bg-slate-50 text-muted border-border hover:bg-slate-100'
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-200 shadow-xs'
+                : 'bg-surface-container-low text-on-surface-variant border-surface-container hover:bg-surface-container'
             }`}
           >
             <span
               className={`w-2 h-2 rounded-full ${
-                onlyAvailable ? 'bg-emerald-500' : 'bg-slate-300'
+                onlyAvailable ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'
               }`}
             />
             <span>Available Tickets Only</span>
@@ -369,38 +363,38 @@ export default function Explore() {
 
         {/* Active Filters Summary */}
         {hasActiveFilters && (
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-muted">
+          <div className="flex items-center justify-between pt-3 border-t border-surface-container text-xs text-on-surface-variant">
             <div className="flex items-center gap-2 flex-wrap">
-              <span>Filtering by:</span>
+              <span className="font-bold">Active Filters:</span>
               {selectedCategory !== 'All' && (
-                <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-medium">
+                <span className="px-2 py-0.5 rounded-md bg-primary-container/10 text-primary-container font-semibold">
                   {selectedCategory}
                 </span>
               )}
               {selectedCity !== 'All Cities' && (
-                <span className="px-2 py-0.5 rounded bg-slate-100 text-text font-medium">
+                <span className="px-2 py-0.5 rounded-md bg-surface-container-low text-on-surface font-semibold">
                   {selectedCity}
                 </span>
               )}
               {selectedTimeframe !== 'upcoming' && (
-                <span className="px-2 py-0.5 rounded bg-slate-100 text-text font-medium">
+                <span className="px-2 py-0.5 rounded-md bg-surface-container-low text-on-surface font-semibold">
                   {TIMEFRAMES.find((t) => t.value === selectedTimeframe)?.label}
                 </span>
               )}
               {(minPrice !== '' || maxPrice !== '') && (
-                <span className="px-2 py-0.5 rounded bg-slate-100 text-text font-medium">
-                  Price: {minPrice ? `PKR ${minPrice}` : 'PKR 0'} -{' '}
-                  {maxPrice ? `PKR ${maxPrice}` : '∞'}
+                <span className="px-2 py-0.5 rounded-md bg-surface-container-low text-on-surface font-semibold">
+                  Price: {minPrice ? `PKR ${Number(minPrice).toLocaleString()}` : 'PKR 0'} -{' '}
+                  {maxPrice ? `PKR ${Number(maxPrice).toLocaleString()}` : 'Any'}
                 </span>
               )}
               {onlyAvailable && (
-                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium">
+                <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-semibold">
                   In Stock Only
                 </span>
               )}
               {searchQuery.trim() && (
-                <span className="px-2 py-0.5 rounded bg-slate-100 text-text font-medium">
-                  "{searchQuery.trim()}"
+                <span className="px-2 py-0.5 rounded-md bg-surface-container-low text-on-surface font-semibold">
+                  &ldquo;{searchQuery.trim()}&rdquo;
                 </span>
               )}
             </div>
@@ -408,7 +402,7 @@ export default function Explore() {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-primary hover:underline font-semibold flex-shrink-0 ml-3"
+              className="text-primary-container hover:underline font-bold flex-shrink-0 ml-3"
             >
               Reset Filters
             </button>
@@ -417,16 +411,16 @@ export default function Explore() {
       </div>
 
       {/* Results Header */}
-      <div className="flex items-center justify-between text-sm text-muted">
+      <div className="flex items-center justify-between text-xs sm:text-sm text-on-surface-variant">
         <p>
-          Showing <span className="font-bold text-text">{events.length}</span> of{' '}
-          <span className="font-bold text-text">{totalCount}</span> events
+          Showing <span className="font-bold text-on-surface">{events.length}</span> of{' '}
+          <span className="font-bold text-on-surface">{totalCount}</span> verified experiences
         </p>
       </div>
 
       {/* Error Banner */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
           {error}
         </div>
       )}
@@ -437,42 +431,38 @@ export default function Explore() {
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl border border-border p-4 space-y-4 animate-pulse"
+              className="bg-surface-container-lowest rounded-2xl border border-surface-container p-4 space-y-4 animate-pulse shadow-xs"
             >
-              <div className="aspect-[16/9] bg-slate-200 rounded-xl w-full" />
+              <div className="aspect-[16/10] bg-surface-container rounded-xl w-full" />
               <div className="space-y-2">
-                <div className="h-4 bg-slate-200 rounded w-1/3" />
-                <div className="h-6 bg-slate-200 rounded w-3/4" />
-                <div className="h-4 bg-slate-200 rounded w-1/2" />
+                <div className="h-4 bg-surface-container rounded w-1/3" />
+                <div className="h-6 bg-surface-container rounded w-3/4" />
+                <div className="h-4 bg-surface-container rounded w-1/2" />
               </div>
-              <div className="h-8 bg-slate-200 rounded w-full pt-2" />
+              <div className="h-8 bg-surface-container rounded w-full pt-2" />
             </div>
           ))}
         </div>
       ) : events.length === 0 ? (
         /* Empty State */
-        <div className="bg-white rounded-2xl border border-border p-12 text-center max-w-xl mx-auto space-y-4 shadow-sm">
-          <div className="w-16 h-16 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
+        <div className="bg-surface-container-lowest rounded-3xl border border-surface-container p-12 text-center max-w-xl mx-auto space-y-4 shadow-xs">
+          <div className="w-16 h-16 mx-auto rounded-full bg-surface-container-low flex items-center justify-center text-outline">
+            <span className="material-symbols-outlined text-[32px]">event_busy</span>
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-text">No events match your search</h3>
-            <p className="text-sm text-muted">
-              We couldn't find any events with the current filters. Try adjusting your search
-              keywords, price filters, or expanding your city selection.
+            <h3 className="text-lg font-bold text-on-surface">No events match your criteria</h3>
+            <p className="text-xs text-on-surface-variant">
+              We couldn&apos;t find any events with the current filters. Try adjusting your search
+              keywords, price range, or expanding your city selection.
             </p>
           </div>
           {hasActiveFilters && (
-            <Button variant="outline" size="sm" onClick={handleResetFilters}>
+            <button
+              onClick={handleResetFilters}
+              className="px-4 py-2 rounded-xl bg-primary-container text-white text-xs font-bold shadow-xs hover:bg-primary transition"
+            >
               Reset All Filters
-            </Button>
+            </button>
           )}
         </div>
       ) : (
@@ -486,28 +476,26 @@ export default function Explore() {
 
       {/* Pagination Controls */}
       {totalPages > 1 && !loading && (
-        <div className="flex items-center justify-center gap-2 pt-6">
-          <Button
-            variant="outline"
-            size="sm"
+        <div className="flex items-center justify-center gap-3 pt-6">
+          <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
+            className="px-4 py-2 rounded-xl border border-surface-container bg-surface-container-lowest text-xs font-bold text-on-surface hover:bg-surface-container-low disabled:opacity-40 disabled:hover:bg-surface-container-lowest transition"
           >
             ← Previous
-          </Button>
+          </button>
 
-          <span className="px-4 text-xs font-semibold text-muted">
+          <span className="px-4 text-xs font-bold text-on-surface-variant">
             Page {currentPage} of {totalPages}
           </span>
 
-          <Button
-            variant="outline"
-            size="sm"
+          <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded-xl border border-surface-container bg-surface-container-lowest text-xs font-bold text-on-surface hover:bg-surface-container-low disabled:opacity-40 disabled:hover:bg-surface-container-lowest transition"
           >
             Next →
-          </Button>
+          </button>
         </div>
       )}
     </div>

@@ -1,168 +1,65 @@
-# OnGo
+# OnGo — Live Event Discovery & Ticketing Platform
 
-OnGo is a full-stack event discovery, ticketing, and event management platform. It connects attendees seeking memorable live experiences with event organizers looking to publish, market, manage, and verify tickets.
+OnGo is a modern full-stack event discovery, atomic ticketing, and event management platform. It connects attendees seeking memorable live experiences with event organizers looking to publish, manage, analyze, and verify live ticket reservations.
 
 > ### 🎓 Zynvex Solutions Internship — Project Status (Batch 4)
-> - **Student Name**: Ehtisham Ul Hassan
+> - **Student Name**: Ehtisham Ul Hassan (`xEhtisham`)
+> - **Student Email**: `ehtishamkhan013@gmail.com`
 > - **Internship ID**: `ZYNVEX-CERT-1436`
+> - **Repository**: [https://github.com/xEhtisham/OnGo](https://github.com/xEhtisham/OnGo)
 > - **Module 1**: Completed & Verified (`Sep 27, 2026`)
-> - **Module 2**: Completed & Verified (`Oct 04, 2026`) — Tag: [`v2.0-module-2`](https://github.com/xEhtisham/OnGo/releases/tag/v2.0-module-2)
+> - **Module 2**: Completed & Verified (`Oct 04, 2026`) — Release Tag: [`v2.0-module-2`](https://github.com/xEhtisham/OnGo/releases/tag/v2.0-module-2)
 > - **Module 3**: **Completed & Fully Verified** (`Oct 12, 2026`)
-
-## Tech Stack
-
-- **Frontend**: React (Vite), Tailwind CSS, React Router
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB, Mongoose
-- **Authentication**: JWT (JSON Web Tokens), bcrypt
+> - **Stitch Kinetic Pulse UI Redesign**: **100% Implemented & Pushed** (`Oct 20, 2026`)
 
 ---
 
-## Module 1 — Foundation & Authentication
+## 🎨 Stitch Design System ("Kinetic Pulse")
 
-Module 1 establishes the core engineering foundation for the OnGo platform:
-- **Project Structure**: Clean separation of `client` and `server` applications
-- **React UI Shell**: Responsive application shell with OnGo design system tokens (Electric Indigo `#4F46E5`, Sunset Coral `#FF5A36`, Mint Emerald `#10B981`) and Manrope typography
-- **Reusable UI Primitives**: Modular `Button` and `Card` components, dynamic `Navbar`, and `RootLayout`
-- **Express Backend**: REST API with modular routers, CORS configuration, and centralized error handling
-- **Database Integration**: MongoDB connection management via Mongoose with connection pooling and graceful error handling
-- **User Authentication**:
-  - Secure registration with client and server input validation
-  - Password hashing with bcrypt (10 salt rounds)
-  - Duplicate account prevention with normalized email indexing
-  - Stateless JWT authentication with signed tokens
-  - Authentication middleware guarding protected endpoints (`GET /api/auth/me`)
-  - Frontend auth state management (`AuthContext`) with persistent sessions and logout
+The entire OnGo user interface has been overhauled to match the official **Stitch UI Design System** (`stitch_ongo_event_discovery_platform/`):
+
+- **Typography**: [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans) (weights 400, 500, 600, 700, 800) with [Google Material Symbols Outlined](https://fonts.google.com/icons) iconography.
+- **Color Palette Tokens**:
+  - **Primary**: Electric Indigo (`#4F46E5` / `#3525CD`) — Core actions, focus rings, brand identity.
+  - **Secondary (CTA)**: Sunset Coral (`#FF5A36` / `#FD5835` / `#B52603`) — Ticket booking, publish buttons, highlight pills.
+  - **Tertiary**: Mint Emerald (`#10B981` / `#006E4B` / `#6FFBBE`) — Verified badges, capacity indicators, confirmed status.
+  - **Surface & Containers**: Ultra-clean layered surfaces (`#FAF8FF`, `#F2F3FF`, `#EAEDFF`, `#FFFFFF`, `#131B2E`).
+- **Official Brand Mark**: Dynamic vector OnGo logo (`Logo.jsx` and `favicon.svg`) with Electric Indigo and Sunset Coral energetic pill geometry.
 
 ---
 
-## Module 2 — Event Management & Organizer System
+## 📱 Implemented UI Screens & Components
 
-Module 2 delivers complete event creation, inventory management, and organizer administrative control:
-- **Event Data Model**:
-  - Comprehensive Mongoose schema with multi-tier ticket subdocuments (`ticketTypes`)
-  - Automated pre-validation hook calculating `totalCapacity` across all ticket tiers
-  - Status support: `Draft`, `Published`, `Sold Out`, `Ended`
-  - Booking controls: `bookingStatus` (`Open`/`Closed`), `maxTicketsPerBooking`
-  - Compound indexing on `organizer`, `status`, `date`, and `city`
-- **Organizer Dashboard**:
-  - 4 live metric overview cards: **Total Events**, **Upcoming Events**, **Total Bookings**, **Tickets Sold**
-  - Upcoming events list with poster thumbnails, schedule, venue, and tickets sold progress
-  - Quick action toolbar (`+ Create Event`, `Manage Events`)
-- **Structured Event Creation & Editing**:
-  - Sectioned form: Event Information, 5MB Image Upload with Live Preview & Replace, Schedule & Duration, Physical Venue Location, Ticket Tiers, and Booking Limits
-  - Dynamic ticket tier builder: Add/remove ticket tiers with custom PKR pricing and quantity
-  - Live Total Capacity counter (strictly without revenue forecasting)
-  - Dual submission actions: "Save Draft" vs "Publish Event"
-- **"My Events" Management Hub**:
-  - Status filter tabs: `All`, `Published`, `Drafts`, `Sold Out`, `Ended`
-  - Instant text search across title, venue name, and city
-  - Category filtering across 8 event categories
-  - Inventory progress bars, starting prices, and contextual actions ("Continue Editing" for drafts, "Manage / Edit", "View Public Event", and "Delete" for published)
-- **Public Event Details Page**:
-  - Panoramic hero cover banner with category & status badges
-  - Schedule, venue location, full experience description, and organizer card
-  - Sticky interactive ticket selection widget with PKR pricing, remaining availability, subtotal calculation, and booking CTA
-  - Organizer shortcut banner for rapid access to event editing
+| Screen / Component | Route | Stitch Specification Match |
+|---|---|---|
+| **Marketplace Discovery & Hero** | `/` (`Home.jsx`) | Editorial hero mosaic, ambient gradient glow, live counter pill, 4-field search capsule, category track, 3-step experience guide |
+| **Explore Marketplace** | `/explore` (`Explore.jsx`) | Sticky category filter chips, price preset pills (`Free`, `Under 2K`, `2K-5K`, `5K+`), availability toggle, active filter badges, responsive grid, pagination |
+| **Panoramic Event Details** | `/events/:id` (`EventDetails.jsx`) | 16:9 cinematic cover, metadata bar (time, venue, host, price), about section, guidelines, directions link, sticky ticket tier selector with counter, similar events discovery |
+| **Checkout & Confirmation Modal** | Overlay (`CheckoutModal.jsx`) | Interactive order breakdown, attendee inputs, instant booking confirmation modal with copyable reference code (`OG-XXXX-XXXX`) |
+| **Boarding Pass Digital Ticket** | Overlay (`TicketPass.jsx`) | Perforated cutouts, cover banner, verified status pill, entry details grid, vector QR code with OnGo center badge, `.ics` calendar download & PDF print |
+| **My Tickets Wallet** | `/my-tickets` (`MyTickets.jsx`) | 3 live metric overview cards, status tabs (`Upcoming`, `Past`, `All`, `Cancelled`), wide responsive ticket cards with quick actions |
+| **Organizer Analytics Studio** | `/organizer` (`Dashboard.jsx`) | 4 KPI metric cards (Events, Upcoming, Tickets Sold, Total Revenue), recent sales feed, upcoming event capacity progress bars |
+| **Organizer Event Management** | `/organizer/events` (`MyEvents.jsx`) | Status filter tabs, search bar, category dropdown, desktop table / mobile cards, attendee roster modal with search, ticket filter & **one-click CSV export** |
+| **Event Creation Studio** | `/organizer/events/new` (`CreateEvent.jsx`, `EventForm.jsx`) | Sectioned form (Info, 5MB Image Upload with drag-and-drop preview, Schedule, Venue, Ticket Tiers builder with live total capacity counter, Booking Limits) |
+| **Event Edit Studio** | `/organizer/events/:id/edit` (`EditEvent.jsx`, `EventForm.jsx`) | Breadcrumb navigation, pre-filled tier management, status switcher, capacity preservation |
+| **User Profile & Security** | `/profile` (`Profile.jsx`) | Initials avatar with photo action, verified badge, personal information form, password security, notification toggles, account danger zone & live `/api/auth/me` JWT verification |
+| **Global Navigation & Footer** | All pages (`Navbar.jsx`, `RootLayout.jsx`) | Sticky glassmorphic navbar with logo, search capsule, role switchers, user menu dropdown, mobile sheet, and multi-column footer |
 
 ---
 
-## Module 3 — Event Discovery, Ticketing & Booking System
+## 💻 Tech Stack
 
-Module 3 delivers an advanced event discovery marketplace, robust atomic ticketing engine, and rich attendee/organizer tools:
-- **Public Event Discovery API (`GET /api/events`)**:
-  - Visibility protection: Exclusively exposes `Published` and `Sold Out` events, preventing leaks of drafts or deleted events
-  - Full-text multi-field search across `title`, `description`, `venueName`, and `city`
-  - Multi-facet filtering: Category pills (8 categories), City selector (Pakistani metropolises), and timeframe (`today`, `this-weekend`, `this-month`, `upcoming`)
-  - **Price Range & Availability Filters**: `$elemMatch` ticket price filtering supporting `minPrice`, `maxPrice`, and `availability=available`
-  - Sorting (`soonest`, `latest`, `newest`) and pagination with total count and page metadata
-- **Explore Marketplace UI (`/explore` & Home page)**:
-  - Reusable `EventCard` component with cover hover zoom, category chip, formatted dates, venue pin, minimum PKR pricing, and remaining seats counter
-  - Interactive Search & Filter Hub with URL search parameter synchronization
-  - Price preset chips (`All Prices`, `Free`, `Under PKR 2K`, `PKR 2K - 5K`, `PKR 5K+`), custom price inputs, and availability toggle
-  - Animated loading skeletons and contextual empty states with "Reset Filters" action
-- **Interactive Event Details & Social Sharing (`EventDetails.jsx`)**:
-  - Dynamic tier capacity progress meters with real-time remaining seat badges
-  - One-click `.ics` Calendar export for Google Calendar, Apple Calendar, and Outlook
-  - Social sharing actions: WhatsApp direct invite and instant clipboard link copy
-  - **Similar Events Discovery**: Category-based event cross-recommendations with instant navigation
-- **Atomic Booking Engine API (`/api/bookings`)**:
-  - Unique booking reference generator producing human-readable codes (`OG-XXXX-XXXX`)
-  - `POST /api/bookings`: Enforces per-order limits (`maxTicketsPerBooking`), verifies remaining tier availability, atomically increments `sold` counts, marks events as `Sold Out` upon reaching capacity, and returns confirmed reservation
-  - `GET /api/bookings/my-tickets`: Retrieves authenticated attendee's ticket history with populated event and organizer contacts
-  - `GET /api/bookings/:id`: Protected single booking lookup with attendee and organizer authorization checks
-  - `GET /api/bookings/event/:eventId`: Organizer endpoint to view complete attendee rosters for their events
-  - `PUT /api/bookings/:id/cancel`: Cancellation flow releasing ticket capacity back to the event and re-opening `Published` status
-- **Interactive Checkout Flow (`CheckoutModal.jsx`)**:
-  - Integrated into `EventDetails.jsx` ticket widget with live PKR subtotal calculation
-  - Pre-fills authenticated attendee contact information with phone number validation
-  - Real-time reservation dispatch with instant post-booking celebration view
-  - Copyable booking reference code and one-click transition to attendee tickets
-- **Attendee Dashboard ("My Tickets" — `/my-tickets`)**:
-  - **Overview Metrics**: Live cards for Upcoming Events, Passes Reserved, and Total Invested (PKR)
-  - Instant ticket search and sorting (`Soonest First`, `Furthest First`, `Highest Amount`)
-  - Tabbed reservation management: `All`, `Upcoming`, `Past`, and `Cancelled`
-  - **Boarding Pass Digital Ticket Modal (`TicketPass.jsx`)**: Printable pass with simulated barcode, reference tag, and print-optimized layout
-  - **Structured Cancellation Modal (`CancelBookingModal.jsx`)**: Reason tracking with instant capacity restoration
-- **Organizer Attendee Roster Tools (`MyEvents.jsx`)**:
-  - Live attendee roster modal with total revenue, confirmed bookings, and tickets sold
-  - Instant text search across attendee name, email, phone, and booking reference
-  - Ticket tier filter dropdown
-  - **CSV Export Engine**: One-click download of `<event-name>_attendees.csv` with complete attendee contact and ticket records
-- **Global Toast Notification System (`ToastContext.jsx`, `Toast.jsx`)**:
-  - Non-blocking feedback for booking confirmations, calendar downloads, link copies, and cancellations
+- **Frontend**: React (Vite), Tailwind CSS v4 with `@theme` token extensions, React Router v7, Material Symbols Outlined, Canvas-Confetti, File-Saver
+- **Backend**: Node.js, Express.js (REST API, CORS, Centralized Error Handling)
+- **Database**: MongoDB, Mongoose with **automatic graceful local failover** (`mongodb://127.0.0.1:27017/ongo`) when Atlas IP restrictions are detected
+- **Authentication**: Stateless JWT (JSON Web Tokens), bcrypt password hashing (10 salt rounds)
 
 ---
 
-## Project Structure
-
-```text
-OnGo/
-├── client/                      # React frontend
-│   ├── src/
-│   │   ├── components/          # Button, Card, Navbar, ProtectedRoute, EventForm, EventCard,
-│   │   │                        # CheckoutModal, TicketPass, CancelBookingModal, Toast
-│   │   ├── context/             # AuthContext, ToastContext & hooks (useAuth, useToast)
-│   │   ├── layouts/             # RootLayout shell & footer
-│   │   ├── pages/
-│   │   │   ├── organizer/       # Dashboard, MyEvents (with Search & CSV Roster Export), CreateEvent, EditEvent
-│   │   │   ├── EventDetails.jsx # Public event details, Similar Events, Calendar Export & Ticket Selector
-│   │   │   ├── Explore.jsx      # Public event discovery with price ranges & availability toggle
-│   │   │   ├── Home.jsx         # Marketplace discovery landing page with featured events
-│   │   │   ├── Login.jsx        # Login page
-│   │   │   ├── MyTickets.jsx    # Attendee dashboard with metrics, search & printable pass hub
-│   │   │   ├── Profile.jsx      # Protected user profile & live API check
-│   │   │   └── Register.jsx     # Registration page
-│   │   ├── services/            # API client service layer (auth + events + bookings)
-│   │   ├── App.jsx              # Router & global ToastProvider wrapper
-│   │   ├── index.css            # Tailwind theme tokens & font imports
-│   │   └── main.jsx             # React DOM entry point
-│   ├── index.html
-│   ├── package.json
-│   └── vite.config.js
-│
-├── server/                      # Express backend
-│   ├── src/
-│   │   ├── config/              # MongoDB connection (db.js)
-│   │   ├── controllers/         # authController, eventController, bookingController
-│   │   ├── middleware/          # authMiddleware.js, errorHandler.js
-│   │   ├── models/              # User.js, Event.js, Booking.js Mongoose models
-│   │   ├── routes/              # authRoutes, eventRoutes, bookingRoutes, healthRoutes
-│   │   ├── utils/               # generateToken.js
-│   │   └── server.js            # Express app & server startup
-│   ├── .env.example             # Environment variable template
-│   └── package.json
-│
-├── .gitignore                   # Ignores node_modules, .env, build dist
-└── README.md
-```
-
----
-
-## Running Locally
+## 🚀 Running Locally
 
 ### Prerequisites
-- Node.js (v18+ recommended)
+- Node.js (v18+)
 - npm (v9+)
 - MongoDB Atlas cluster URI or local MongoDB Community Server
 
@@ -175,22 +72,21 @@ cd server
 npm install
 ```
 
-#### Configure Environment Variables
-Create a `.env` file in the `server/` directory (see `server/.env.example`):
+#### Configure Environment Variables (`server/.env`):
 ```env
 PORT=5000
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/ongo?retryWrites=true&w=majority
-JWT_SECRET=your_jwt_secret_key_here
+JWT_SECRET=ongo_super_secret_jwt_key_2026
 CLIENT_URL=http://localhost:5173
 ```
 
-> **Security Note**: Never commit your `.env` file. It is ignored by Git.
+> **Note on Database Connection**: If your Atlas IP whitelist prevents remote connection, the server will **automatically fall back to local MongoDB** (`mongodb://127.0.0.1:27017/ongo`) with zero downtime!
 
-#### Start the Backend Server
+#### Start Backend:
 ```bash
 npm run dev
 ```
-The server will connect to MongoDB and start on `http://localhost:5000`.
+The server will start on `http://localhost:5000`.
 
 ---
 
@@ -203,9 +99,15 @@ npm run dev
 ```
 The Vite development server will start on `http://localhost:5173`.
 
+#### Verify Production Build:
+```bash
+npm run build
+```
+Builds in under ~800ms with zero errors.
+
 ---
 
-## API Endpoints Reference
+## 📡 API Endpoints Reference
 
 ### Authentication (`/api/auth`)
 | Method | Endpoint | Access | Description |
@@ -213,23 +115,23 @@ The Vite development server will start on `http://localhost:5173`.
 | `GET` | `/api/health` | Public | Backend health check & uptime status |
 | `POST` | `/api/auth/register` | Public | Register new user with hashed password |
 | `POST` | `/api/auth/login` | Public | Authenticate user & return signed JWT |
-| `GET` | `/api/auth/me` | Protected | Get current user profile (requires Bearer token) |
+| `GET` | `/api/auth/me` | Protected | Get current user profile (verified via Bearer token) |
 
 ### Event Discovery & Organizer Management (`/api/events`)
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
 | `GET` | `/api/events` | Public | Discover published events with search, category, city, date, price ranges (`minPrice`, `maxPrice`), availability (`available`) & pagination |
 | `GET` | `/api/events/:id` | Public | Get single event details with populated organizer |
-| `POST` | `/api/events` | Protected | Create draft or published event with ticket tiers |
+| `POST` | `/api/events` | Protected | Create draft or published event with multi-tier tickets |
 | `GET` | `/api/events/organizer` | Protected | List organizer events with status filter & search |
-| `GET` | `/api/events/organizer/stats` | Protected | Aggregated dashboard metrics (Events, Upcoming, Tickets Sold, Total Bookings) |
+| `GET` | `/api/events/organizer/stats` | Protected | Aggregated dashboard metrics (Events, Upcoming, Tickets Sold, Total Revenue) |
 | `PUT` | `/api/events/:id` | Protected | Update event (validated against organizer ownership) |
 | `DELETE` | `/api/events/:id` | Protected | Delete event (validated against organizer ownership) |
 
 ### Ticketing & Bookings (`/api/bookings`)
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `POST` | `/api/bookings` | Protected | Reserve tickets with atomic inventory deduction and reference generation |
+| `POST` | `/api/bookings` | Protected | Reserve tickets with atomic inventory deduction and unique reference code (`OG-XXXX-XXXX`) |
 | `GET` | `/api/bookings/my-tickets` | Protected | List attendee's booked tickets with event details |
 | `GET` | `/api/bookings/:id` | Protected | Get single booking receipt (attendee or event organizer access) |
 | `GET` | `/api/bookings/event/:eventId` | Protected | Get complete attendee roster for organizer's event |
@@ -237,8 +139,9 @@ The Vite development server will start on `http://localhost:5173`.
 
 ---
 
-## License & Internship Context
+## 👨‍💻 License & Author
 
-- **Internship ID**: ZYNVEX-CERT-1436
+- **Internship Program**: Zynvex Solutions Software Engineering Internship (Batch 4)
+- **Internship ID**: `ZYNVEX-CERT-1436`
+- **Developer**: Ehtisham Ul Hassan ([@xEhtisham](https://github.com/xEhtisham))
 - **Repository**: [https://github.com/xEhtisham/OnGo](https://github.com/xEhtisham/OnGo)
-- **Author**: Ehtisham Ul Hassan

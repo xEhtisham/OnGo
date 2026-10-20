@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
-import Button from '../../components/Button';
-import { Card, CardTitle, CardDescription } from '../../components/Card';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -34,8 +32,8 @@ export default function Dashboard() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm text-muted">Loading organizer dashboard...</p>
+          <div className="w-10 h-10 border-4 border-primary-container border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm font-semibold text-on-surface-variant">Loading organizer dashboard...</p>
         </div>
       </div>
     );
@@ -44,12 +42,15 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="p-6 rounded-2xl bg-red-50 border border-red-200 text-error">
+        <div className="p-6 rounded-3xl bg-rose-50 border border-rose-200 text-rose-700">
           <h2 className="text-lg font-bold">Failed to load dashboard</h2>
-          <p className="text-sm mt-1">{error}</p>
-          <Button variant="outline" size="sm" onClick={loadDashboardData} className="mt-4">
+          <p className="text-xs mt-1">{error}</p>
+          <button
+            onClick={loadDashboardData}
+            className="mt-4 px-4 py-2 rounded-xl bg-primary-container text-white text-xs font-bold"
+          >
             Try Again
-          </Button>
+          </button>
         </div>
       </div>
     );
@@ -60,98 +61,172 @@ export default function Dashboard() {
       title: 'Total Events',
       value: stats?.totalEvents ?? 0,
       description: 'All created events',
-      iconBg: 'bg-primary/10 text-primary',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
+      icon: 'calendar_month',
+      iconColor: 'text-primary-container',
+      barColor: 'bg-primary-container',
     },
     {
       title: 'Upcoming Events',
       value: stats?.upcomingEvents ?? 0,
-      description: 'Published & scheduled',
-      iconBg: 'bg-emerald-100 text-emerald-700',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
+      description: 'Live on marketplace',
+      icon: 'upcoming',
+      iconColor: 'text-tertiary-container',
+      barColor: 'bg-emerald-600',
     },
     {
       title: 'Total Bookings',
       value: stats?.totalBookings ?? 0,
       description: 'Confirmed attendee orders',
-      iconBg: 'bg-amber-100 text-amber-700',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-        </svg>
-      ),
+      icon: 'receipt_long',
+      iconColor: 'text-primary-container',
+      barColor: 'bg-primary',
     },
     {
       title: 'Tickets Sold',
       value: stats?.ticketsSold ?? 0,
       description: 'Across all ticket tiers',
-      iconBg: 'bg-coral/10 text-coral',
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-        </svg>
-      ),
+      icon: 'confirmation_number',
+      iconColor: 'text-secondary-container',
+      barColor: 'bg-secondary-container',
     },
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8">
       {/* Header & Quick Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-border">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-surface-container">
         <div>
-          <h1 className="text-3xl font-extrabold text-text tracking-tight">Organizer Dashboard</h1>
-          <p className="mt-1 text-sm text-muted">
-            Overview of your event schedule, ticket availability, and operational metrics.
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-primary text-xs font-bold uppercase tracking-wider mb-2">
+            <span className="material-symbols-outlined text-[16px]">dashboard</span>
+            <span>Organizer Studio</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-on-surface tracking-tight">
+            Dashboard Overview
+          </h1>
+          <p className="mt-1 text-sm text-on-surface-variant">
+            Track real-time event status, ticket sales quotas, and attendee bookings.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <Link to="/organizer/events">
-            <Button variant="secondary" size="md">
-              Manage Events
-            </Button>
+          <Link
+            to="/organizer/events"
+            className="px-4 py-2.5 rounded-xl border border-surface-container bg-surface-container-lowest text-on-surface font-bold text-sm hover:bg-surface-container-low transition shadow-xs"
+          >
+            Manage Events
           </Link>
-          <Link to="/organizer/events/new">
-            <Button variant="cta" size="md">
-              + Create Event
-            </Button>
+          <Link
+            to="/organizer/events/new"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary-container hover:bg-primary text-white font-bold text-sm shadow-md transition-all active:scale-[0.98]"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            <span>+ Create Event</span>
           </Link>
         </div>
       </div>
 
       {/* 4 Metric Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {metricCards.map((card, index) => (
-          <Card key={index} className="flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${card.iconBg}`}>
-              {card.icon}
+          <div
+            key={index}
+            className="relative bg-surface-container-lowest rounded-2xl border border-surface-container p-6 shadow-xs flex flex-col justify-between overflow-hidden hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                {card.title}
+              </span>
+              <div className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center">
+                <span className={`material-symbols-outlined text-[22px] ${card.iconColor}`}>
+                  {card.icon}
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="text-xs font-bold text-muted uppercase tracking-wider">{card.title}</span>
-              <p className="text-2xl font-extrabold text-text mt-0.5">{card.value}</p>
-              <p className="text-xs text-muted mt-0.5">{card.description}</p>
+
+            <div className="mt-4">
+              <div className="text-3xl font-extrabold text-on-surface leading-none tracking-tight">
+                {card.value}
+              </div>
+              <p className="mt-1.5 text-xs text-on-surface-variant">{card.description}</p>
             </div>
-          </Card>
+
+            <div className={`absolute bottom-0 left-0 right-0 h-1.5 ${card.barColor}`}></div>
+          </div>
         ))}
+      </div>
+
+      {/* Quick Navigation Strip */}
+      <div className="bg-surface-container-lowest rounded-2xl border border-surface-container p-3 sm:p-4 shadow-xs">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Link
+            to="/organizer/events/new"
+            className="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container-low transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-primary-container/10 text-primary-container flex items-center justify-center group-hover:bg-primary-container group-hover:text-white transition-colors">
+              <span className="material-symbols-outlined text-[20px]">add_circle</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-xs text-on-surface truncate">Create Event</span>
+              <span className="text-[11px] text-muted">New ticketed listing</span>
+            </div>
+          </Link>
+
+          <Link
+            to="/organizer/events"
+            className="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container-low transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-surface-container-low text-on-surface flex items-center justify-center group-hover:bg-primary-container group-hover:text-white transition-colors">
+              <span className="material-symbols-outlined text-[20px]">format_list_bulleted</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-xs text-on-surface truncate">Manage Events</span>
+              <span className="text-[11px] text-muted">Edit details &amp; quotas</span>
+            </div>
+          </Link>
+
+          <Link
+            to="/organizer/events"
+            className="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container-low transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-surface-container-low text-on-surface flex items-center justify-center group-hover:bg-primary-container group-hover:text-white transition-colors">
+              <span className="material-symbols-outlined text-[20px]">group</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-xs text-on-surface truncate">Attendee Rosters</span>
+              <span className="text-[11px] text-muted">Search &amp; CSV export</span>
+            </div>
+          </Link>
+
+          <Link
+            to="/explore"
+            className="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container-low transition-colors group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-secondary-container/10 text-secondary-container flex items-center justify-center group-hover:bg-secondary-container group-hover:text-white transition-colors">
+              <span className="material-symbols-outlined text-[20px]">explore</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-xs text-on-surface truncate">Live Marketplace</span>
+              <span className="text-[11px] text-muted">View public listings</span>
+            </div>
+          </Link>
+        </div>
       </div>
 
       {/* Upcoming Events Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-text">Upcoming Events</h2>
-            <p className="text-xs text-muted">Your scheduled and published live events.</p>
+            <h2 className="text-xl font-extrabold text-on-surface tracking-tight">
+              Upcoming Events
+            </h2>
+            <p className="text-xs text-on-surface-variant">Your published live events.</p>
           </div>
-          <Link to="/organizer/events" className="text-sm font-bold text-primary hover:underline">
-            View All Events &rarr;
+          <Link
+            to="/organizer/events"
+            className="text-xs font-bold text-primary-container hover:underline inline-flex items-center gap-1"
+          >
+            <span>View All ({upcomingEvents.length})</span>
+            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
           </Link>
         </div>
 
@@ -169,9 +244,12 @@ export default function Dashboard() {
               const percentSold = Math.min(100, Math.round((totalSold / capacity) * 100));
 
               return (
-                <Card key={event._id} className="flex flex-col sm:flex-row gap-4 p-5 hover:shadow-md transition-shadow">
+                <div
+                  key={event._id}
+                  className="bg-surface-container-lowest rounded-3xl border border-surface-container p-5 shadow-xs hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-4"
+                >
                   {/* Thumbnail Poster */}
-                  <div className="w-full sm:w-40 h-32 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0 border border-border">
+                  <div className="w-full sm:w-40 h-32 rounded-2xl overflow-hidden bg-surface-container flex-shrink-0">
                     <img
                       src={event.coverImage}
                       alt={event.title}
@@ -183,65 +261,66 @@ export default function Dashboard() {
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-primary/10 text-primary">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-primary-fixed text-primary uppercase">
                           {event.category}
                         </span>
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 uppercase">
                           {event.status}
                         </span>
                       </div>
-                      <h3 className="font-bold text-text text-base line-clamp-1">{event.title}</h3>
-                      <p className="text-xs text-muted mt-1">
-                        📅 {eventDate} • ⏰ {event.startTime} - {event.endTime}
+                      <h3 className="font-bold text-on-surface text-base line-clamp-1">{event.title}</h3>
+                      <p className="text-xs text-on-surface-variant mt-1">
+                        📅 {eventDate} {event.startTime ? `• ⏰ ${event.startTime}` : ''}
                       </p>
-                      <p className="text-xs text-muted mt-0.5">
+                      <p className="text-xs text-on-surface-variant mt-0.5">
                         📍 {event.venueName}, {event.city}
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+                    <div className="mt-4 pt-3 border-t border-surface-container flex items-center justify-between">
                       <div className="text-xs">
                         <span className="text-muted">Tickets: </span>
-                        <span className="font-bold text-text">
+                        <span className="font-extrabold text-on-surface">
                           {totalSold} / {event.totalCapacity} ({percentSold}%)
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <Link to={`/events/${event._id}`}>
-                          <Button variant="ghost" size="sm">
-                            View
-                          </Button>
+                        <Link
+                          to={`/events/${event._id}`}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold text-on-surface-variant hover:bg-surface-container-low transition"
+                        >
+                          View
                         </Link>
-                        <Link to={`/organizer/events/${event._id}/edit`}>
-                          <Button variant="outline" size="sm">
-                            Manage
-                          </Button>
+                        <Link
+                          to={`/organizer/events/${event._id}/edit`}
+                          className="px-3 py-1.5 rounded-xl border border-surface-container text-xs font-bold text-primary-container hover:bg-surface-container-low transition shadow-xs"
+                        >
+                          Manage
                         </Link>
                       </div>
                     </div>
                   </div>
-                </Card>
+                </div>
               );
             })}
           </div>
         ) : (
-          <Card className="text-center py-12 border-dashed border-border bg-slate-50/50">
-            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+          <div className="text-center py-12 border-2 border-dashed border-surface-container rounded-3xl bg-surface-container-lowest p-8 space-y-3">
+            <div className="w-12 h-12 rounded-full bg-primary-fixed text-primary flex items-center justify-center mx-auto">
+              <span className="material-symbols-outlined text-[24px]">event_available</span>
             </div>
-            <CardTitle className="text-lg">No Upcoming Events</CardTitle>
-            <CardDescription className="max-w-sm mx-auto mt-1 mb-6">
+            <h3 className="text-base font-bold text-on-surface">No Upcoming Events</h3>
+            <p className="text-xs text-on-surface-variant max-w-sm mx-auto">
               You do not have any published upcoming events scheduled. Create one now to start discovery and ticketing.
-            </CardDescription>
-            <Link to="/organizer/events/new">
-              <Button variant="cta" size="sm">
-                + Create Your First Event
-              </Button>
+            </p>
+            <Link
+              to="/organizer/events/new"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary-container text-white text-xs font-bold shadow-xs hover:bg-primary transition"
+            >
+              + Create Your First Event
             </Link>
-          </Card>
+          </div>
         )}
       </div>
     </div>

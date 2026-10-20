@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import EventForm from '../../components/EventForm';
 import api from '../../services/api';
 
@@ -40,8 +40,8 @@ export default function EditEvent() {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm text-muted">Loading event details...</p>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm font-medium text-on-surface-variant">Loading event details...</p>
         </div>
       </div>
     );
@@ -50,12 +50,15 @@ export default function EditEvent() {
   if (fetchError || !event) {
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center">
-        <div className="p-6 rounded-2xl bg-red-50 border border-red-200 text-error">
-          <h2 className="text-lg font-bold">Unable to load event</h2>
-          <p className="text-sm mt-1">{fetchError || 'Event not found.'}</p>
+        <div className="p-8 rounded-2xl bg-surface-container-lowest border border-error/30 text-on-surface shadow-sm space-y-4">
+          <div className="w-12 h-12 mx-auto rounded-full bg-error-container/40 text-error flex items-center justify-center">
+            <span className="material-symbols-outlined text-[28px]">error</span>
+          </div>
+          <h2 className="text-lg font-bold text-on-surface">Unable to load event</h2>
+          <p className="text-sm text-on-surface-variant">{fetchError || 'Event not found.'}</p>
           <button
             onClick={() => navigate('/organizer/events')}
-            className="mt-4 px-4 py-2 rounded-xl bg-white border border-red-200 text-text text-sm font-semibold hover:bg-slate-50 transition-colors"
+            className="mt-2 px-5 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold transition-colors"
           >
             Back to My Events
           </button>
@@ -65,10 +68,26 @@ export default function EditEvent() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-text tracking-tight">Edit Event</h1>
-        <p className="mt-1 text-sm text-muted">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      {/* Breadcrumb & Title Bar */}
+      <div className="space-y-2">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
+          <Link to="/organizer" className="hover:text-primary transition-colors">
+            Organizer
+          </Link>
+          <span className="text-outline">/</span>
+          <Link to="/organizer/events" className="hover:text-primary transition-colors">
+            My Events
+          </Link>
+          <span className="text-outline">/</span>
+          <span className="text-on-surface font-semibold truncate max-w-[200px]">
+            {event.title}
+          </span>
+        </nav>
+        <h1 className="font-headline-lg text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight">
+          Edit Event
+        </h1>
+        <p className="font-body-md text-sm sm:text-base text-on-surface-variant">
           Modify event schedule, pricing, capacity, and publication settings.
         </p>
       </div>

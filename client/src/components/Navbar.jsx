@@ -1,54 +1,73 @@
-import { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Button from './Button';
+import Logo from './Logo';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+
   const { user, isAuthenticated, logout } = useAuth();
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setUserDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/explore?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
+
   const navLinkClasses = ({ isActive }) =>
-    `text-sm font-medium transition-colors ${
-      isActive ? 'text-primary font-semibold' : 'text-muted hover:text-text'
+    `font-semibold text-sm transition-colors px-2 py-1 ${
+      isActive
+        ? 'text-primary-container font-bold border-b-2 border-primary-container'
+        : 'text-on-surface-variant hover:text-on-surface'
     }`;
 
   const handleLogout = () => {
+    setUserDropdownOpen(false);
     setMobileMenuOpen(false);
     logout();
+    navigate('/');
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">
+    <header className="sticky top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-surface-container shadow-[0_1px_8px_rgba(0,0,0,0.03)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-extrabold text-lg shadow-sm">
-                O
-              </span>
-              <span className="text-xl font-extrabold text-text tracking-tight">
-                On<span className="text-primary">Go</span>
-              </span>
+        <div className="flex items-center justify-between h-20 gap-4">
+          {/* Brand Logo */}
+          <div className="flex items-center gap-8 shrink-0">
+            <Link to="/" className="flex items-center">
+              <Logo />
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-6">
-              <NavLink to="/" className={navLinkClasses} end>
-                Home
-              </NavLink>
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-6">
               <NavLink to="/explore" className={navLinkClasses}>
-                Explore
+                Explore Events
               </NavLink>
 
-              {/* Authenticated attendee & organizer navigation links */}
               {isAuthenticated && (
                 <>
                   <NavLink to="/my-tickets" className={navLinkClasses}>
                     My Tickets
                   </NavLink>
                   <NavLink to="/organizer/dashboard" className={navLinkClasses}>
-                    Dashboard
+                    Organizer Hub
                   </NavLink>
                   <NavLink to="/organizer/events" className={navLinkClasses}>
                     My Events
@@ -58,161 +77,234 @@ export default function Navbar() {
             </nav>
           </div>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Quick Search Capsule */}
+          <form
+            onSubmit={handleSearchSubmit}
+            className="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-2 gap-2 max-w-xs w-full border border-transparent focus-within:border-primary-container/30 focus-within:bg-white transition-all shadow-xs"
+          >
+            <span className="material-symbols-outlined text-outline text-[20px] shrink-0">
+              search
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search events, vibes, artists..."
+              className="bg-transparent text-sm text-on-surface placeholder:text-outline focus:outline-none w-full"
+            />
+          </form>
+
+          {/* Desktop Right Actions */}
+          <div className="hidden sm:flex items-center gap-3">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
-                <Link to="/organizer/events/new">
-                  <Button variant="cta" size="sm">
-                    + Create Event
-                  </Button>
-                </Link>
                 <Link
-                  to="/profile"
-                  className="flex items-center gap-2 text-sm font-semibold text-text hover:text-primary transition-colors px-2 py-1.5 rounded-lg hover:bg-slate-50"
+                  to="/organizer/events/new"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary-container hover:bg-primary text-white font-bold text-sm shadow-sm transition-all active:scale-[0.98]"
                 >
-                  <span className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
-                    {user?.name ? user.name[0].toUpperCase() : 'U'}
-                  </span>
-                  <span>{user?.name?.split(' ')[0] || 'Account'}</span>
+                  <span className="material-symbols-outlined text-[18px]">add</span>
+                  <span>Create Event</span>
                 </Link>
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
-                  Sign Out
-                </Button>
+
+                {/* User Dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-2 p-1.5 rounded-full hover:bg-surface-container-low transition-colors focus:outline-none"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                      {user?.name ? user.name[0].toUpperCase() : 'U'}
+                    </div>
+                  </button>
+
+                  {userDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-white border border-surface-container shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-4 py-3 border-b border-surface-container">
+                        <p className="text-sm font-bold text-on-surface truncate">{user?.name}</p>
+                        <p className="text-xs text-muted truncate">{user?.email}</p>
+                      </div>
+
+                      <div className="py-1">
+                        <Link
+                          to="/my-tickets"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[18px] text-primary-container">
+                            confirmation_number
+                          </span>
+                          <span>My Tickets</span>
+                        </Link>
+                        <Link
+                          to="/profile"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[18px] text-primary-container">
+                            person
+                          </span>
+                          <span>User Profile</span>
+                        </Link>
+                        <Link
+                          to="/organizer/dashboard"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[18px] text-primary-container">
+                            dashboard
+                          </span>
+                          <span>Organizer Studio</span>
+                        </Link>
+                        <Link
+                          to="/organizer/events"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[18px] text-primary-container">
+                            event
+                          </span>
+                          <span>Manage Events</span>
+                        </Link>
+                      </div>
+
+                      <div className="pt-1 border-t border-surface-container">
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="flex items-center gap-2.5 w-full text-left px-4 py-2 text-sm text-error hover:bg-red-50 transition-colors font-medium"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">logout</span>
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
-              <>
-                <Link to="/login">
-                  <Button variant="ghost" size="sm">
-                    Log In
-                  </Button>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className="font-semibold text-sm text-on-surface hover:text-primary-container px-3.5 py-2 rounded-xl hover:bg-surface-container-low transition-colors"
+                >
+                  Log in
                 </Link>
-                <Link to="/register">
-                  <Button variant="cta" size="sm">
-                    Get Started
-                  </Button>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center font-bold text-sm text-white bg-primary-container hover:bg-primary px-4 py-2 rounded-xl shadow-xs transition-all active:scale-[0.98]"
+                >
+                  Create Account
                 </Link>
-              </>
+              </div>
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="flex md:hidden">
+          {/* Mobile hamburger button */}
+          <div className="flex sm:hidden">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-muted hover:text-text hover:bg-slate-100 focus:outline-none"
+              className="p-2 rounded-xl text-on-surface hover:bg-surface-container-low transition"
               aria-label="Toggle menu"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                {mobileMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
+              <span className="material-symbols-outlined text-[26px]">
+                {mobileMenuOpen ? 'close' : 'menu'}
+              </span>
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile menu dropdown */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-white px-4 pt-3 pb-5 space-y-3">
-          <nav className="flex flex-col space-y-2">
-            <NavLink
-              to="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className={navLinkClasses}
-              end
-            >
-              Home
-            </NavLink>
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden border-t border-surface-container py-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
+            <form onSubmit={handleSearchSubmit} className="relative mb-3">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search events..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-container-low text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container"
+              />
+              <span className="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[20px]">
+                search
+              </span>
+            </form>
+
             <NavLink
               to="/explore"
               onClick={() => setMobileMenuOpen(false)}
-              className={navLinkClasses}
+              className="block px-3 py-2 rounded-xl text-base font-semibold text-on-surface hover:bg-surface-container-low"
             >
-              Explore
+              Explore Events
             </NavLink>
-            {isAuthenticated && (
+
+            {isAuthenticated ? (
               <>
                 <NavLink
                   to="/my-tickets"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={navLinkClasses}
+                  className="block px-3 py-2 rounded-xl text-base font-semibold text-on-surface hover:bg-surface-container-low"
                 >
                   My Tickets
                 </NavLink>
                 <NavLink
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-2 rounded-xl text-base font-semibold text-on-surface hover:bg-surface-container-low"
+                >
+                  User Profile
+                </NavLink>
+                <NavLink
                   to="/organizer/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={navLinkClasses}
+                  className="block px-3 py-2 rounded-xl text-base font-semibold text-on-surface hover:bg-surface-container-low"
                 >
-                  Dashboard
+                  Organizer Studio
                 </NavLink>
                 <NavLink
                   to="/organizer/events"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={navLinkClasses}
+                  className="block px-3 py-2 rounded-xl text-base font-semibold text-on-surface hover:bg-surface-container-low"
                 >
                   My Events
                 </NavLink>
                 <NavLink
-                  to="/profile"
+                  to="/organizer/events/new"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={navLinkClasses}
+                  className="block px-3 py-2 rounded-xl text-base font-bold text-primary-container bg-primary-fixed/30"
                 >
-                  My Account
+                  + Create New Event
                 </NavLink>
-              </>
-            )}
-          </nav>
-
-          <div className="pt-3 border-t border-border flex flex-col gap-2">
-            {isAuthenticated ? (
-              <>
-                <Link to="/organizer/events/new" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="cta" size="sm" className="w-full">
-                    + Create Event
-                  </Button>
-                </Link>
-                <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full text-left px-3 py-2 rounded-xl text-base font-semibold text-error hover:bg-red-50"
+                >
                   Sign Out
-                </Button>
+                </button>
               </>
             ) : (
-              <>
-                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Log In
-                  </Button>
+              <div className="pt-2 border-t border-surface-container flex flex-col gap-2">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2.5 text-center font-bold text-sm text-on-surface rounded-xl bg-surface-container-low"
+                >
+                  Log in
                 </Link>
-                <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="cta" size="sm" className="w-full">
-                    Get Started
-                  </Button>
+                <Link
+                  to="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2.5 text-center font-bold text-sm text-white rounded-xl bg-primary-container"
+                >
+                  Create Account
                 </Link>
-              </>
+              </div>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 }

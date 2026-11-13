@@ -269,11 +269,20 @@ export default function Dashboard() {
                         </span>
                       </div>
                       <h3 className="font-bold text-on-surface text-base line-clamp-1">{event.title}</h3>
-                      <p className="text-xs text-on-surface-variant mt-1">
-                        📅 {eventDate} {event.startTime ? `• ⏰ ${event.startTime}` : ''}
+                      <p className="text-xs text-on-surface-variant mt-1 flex items-center gap-1 flex-wrap">
+                        <span className="material-symbols-outlined text-[14px] text-primary-container">calendar_today</span>
+                        <span>{eventDate}</span>
+                        {event.startTime && (
+                          <>
+                            <span className="text-outline">•</span>
+                            <span className="material-symbols-outlined text-[14px] text-outline">schedule</span>
+                            <span>{event.startTime}</span>
+                          </>
+                        )}
                       </p>
-                      <p className="text-xs text-on-surface-variant mt-0.5">
-                        📍 {event.venueName}, {event.city}
+                      <p className="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px] text-outline">pin_drop</span>
+                        <span>{event.venueName}, {event.city}</span>
                       </p>
                     </div>
 

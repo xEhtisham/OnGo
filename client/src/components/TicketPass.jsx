@@ -45,7 +45,7 @@ export default function TicketPass({ booking, onClose }) {
             <button
               type="button"
               onClick={handlePrint}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[16px]">print</span>
               <span>Print / PDF</span>
@@ -53,10 +53,10 @@ export default function TicketPass({ booking, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition"
+              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
               aria-label="Close"
             >
-              ✕
+              <span className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function TicketPass({ booking, onClose }) {
 
             {isCancelled ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-error text-white shadow-xs">
-                <span>✕</span> CANCELLED
+                <span className="material-symbols-outlined text-[14px]">block</span> CANCELLED
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 shadow-xs">
@@ -232,9 +232,10 @@ export default function TicketPass({ booking, onClose }) {
             <button
               type="button"
               onClick={handleCopyRef}
-              className="text-primary-container hover:underline print:hidden"
+              className="text-primary-container hover:underline print:hidden cursor-pointer flex items-center gap-0.5"
             >
-              {copied ? '✓' : 'Copy'}
+              <span className="material-symbols-outlined text-[14px]">{copied ? 'check' : 'content_copy'}</span>
+              <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
         </div>
@@ -243,7 +244,7 @@ export default function TicketPass({ booking, onClose }) {
         <div className="p-6 pt-2 border-t border-surface-container flex gap-3 print:hidden">
           <button
             type="button"
-            className="w-full py-3 rounded-xl bg-primary-container hover:bg-primary text-white font-bold text-xs shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+            className="w-full py-3 rounded-xl bg-primary-container hover:bg-primary text-white font-bold text-xs shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 cursor-pointer"
             onClick={handlePrint}
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
@@ -251,7 +252,7 @@ export default function TicketPass({ booking, onClose }) {
           </button>
           <button
             type="button"
-            className="w-full py-3 rounded-xl border border-surface-container bg-surface-container-lowest text-on-surface font-bold text-xs hover:bg-surface-container-low transition"
+            className="w-full py-3 rounded-xl border border-surface-container bg-surface-container-lowest text-on-surface font-bold text-xs hover:bg-surface-container-low transition cursor-pointer"
             onClick={onClose}
           >
             Close Pass

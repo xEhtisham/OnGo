@@ -118,7 +118,7 @@ export default function CheckoutModal({
         <div className="flex items-center justify-between pb-3 border-b border-surface-container">
           <div>
             <h2 className="text-xl font-extrabold text-on-surface">
-              {confirmedBooking ? 'Reservation Confirmed! 🎉' : 'Checkout & Ticket Review'}
+              {confirmedBooking ? 'Reservation Confirmed!' : 'Checkout & Ticket Review'}
             </h2>
             <p className="text-xs text-on-surface-variant mt-0.5">
               {confirmedBooking ? 'Your digital pass is ready' : event?.title}
@@ -127,18 +127,18 @@ export default function CheckoutModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full text-outline hover:text-on-surface hover:bg-surface-container-low transition"
+            className="p-1.5 rounded-full text-outline hover:text-on-surface hover:bg-surface-container-low transition cursor-pointer"
             aria-label="Close"
           >
-            ✕
+            <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
         {/* If user is not authenticated, prompt login */}
         {!isAuthenticated && !confirmedBooking ? (
           <div className="space-y-5 text-center py-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-primary-fixed text-primary flex items-center justify-center text-2xl shadow-xs">
-              🔒
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-primary-fixed text-primary flex items-center justify-center shadow-xs">
+              <span className="material-symbols-outlined text-[28px]">lock</span>
             </div>
             <div className="space-y-1">
               <h3 className="text-base font-bold text-on-surface">Sign In Required to Reserve</h3>
@@ -191,7 +191,7 @@ export default function CheckoutModal({
                 <button
                   type="button"
                   onClick={handleCopyReference}
-                  className="p-1.5 rounded-lg text-outline hover:text-on-surface hover:bg-white transition"
+                  className="p-1.5 rounded-lg text-outline hover:text-on-surface hover:bg-white transition cursor-pointer"
                   title="Copy Reference Code"
                 >
                   {copied ? (
@@ -233,7 +233,7 @@ export default function CheckoutModal({
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <button
                 type="button"
-                className="w-full py-3.5 rounded-xl bg-primary-container hover:bg-primary text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-primary-container hover:bg-primary text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
                 onClick={() => {
                   onClose();
                   navigate('/my-tickets');
@@ -244,7 +244,7 @@ export default function CheckoutModal({
               </button>
               <button
                 type="button"
-                className="w-full sm:w-auto px-5 py-3.5 rounded-xl border border-surface-container bg-surface-container-lowest text-on-surface font-bold text-sm hover:bg-surface-container-low transition"
+                className="w-full sm:w-auto px-5 py-3.5 rounded-xl border border-surface-container bg-surface-container-lowest text-on-surface font-bold text-sm hover:bg-surface-container-low transition cursor-pointer"
                 onClick={onClose}
               >
                 Done
@@ -364,7 +364,7 @@ export default function CheckoutModal({
               <button
                 type="submit"
                 disabled={loading || totalSelectedTickets === 0}
-                className="w-full py-3.5 rounded-xl bg-primary-container hover:bg-primary disabled:opacity-50 text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-primary-container hover:bg-primary disabled:opacity-50 text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>

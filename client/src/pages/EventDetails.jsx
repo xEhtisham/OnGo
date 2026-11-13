@@ -253,8 +253,8 @@ export default function EventDetails() {
         {isOrganizer && (
           <div className="p-4 rounded-2xl bg-primary-fixed/20 border border-primary-container/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-lg bg-primary-container text-white flex items-center justify-center font-bold text-sm">
-                ★
+              <span className="w-8 h-8 rounded-lg bg-primary-container text-white flex items-center justify-center">
+                <span className="material-symbols-outlined text-[18px]">star</span>
               </span>
               <div>
                 <p className="text-sm font-bold text-on-surface">You are the host of this event</p>
@@ -297,7 +297,7 @@ export default function EventDetails() {
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 px-3 py-1 bg-secondary-container text-white text-xs font-bold rounded-full shadow-sm animate-pulse">
-                    <span>🔥</span> SELLING FAST
+                    <span className="material-symbols-outlined text-[14px]">local_fire_department</span> SELLING FAST
                   </span>
                 )}
               </div>
@@ -390,7 +390,9 @@ export default function EventDetails() {
                     {minPrice === 0 ? 'Free' : `PKR ${minPrice.toLocaleString()}`}
                   </span>
                 </div>
-                <span className="text-[11px] text-emerald-700 font-semibold">● Instant Mobile Pass</span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Instant Mobile Pass
+                </span>
               </div>
             </div>
           </div>
@@ -623,7 +625,7 @@ export default function EventDetails() {
                     event.status === 'Draft'
                   }
                   onClick={handleBookingClick}
-                  className="w-full py-3.5 rounded-xl bg-primary-container hover:bg-primary disabled:opacity-50 text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl bg-primary-container hover:bg-primary disabled:opacity-50 text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                 >
                   <span className="material-symbols-outlined text-[18px]">confirmation_number</span>
                   <span>
@@ -651,7 +653,7 @@ export default function EventDetails() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">✨</span>
+                  <span className="material-symbols-outlined text-[22px] text-primary-container">auto_awesome</span>
                   <h2 className="text-2xl font-extrabold text-on-surface tracking-tight">
                     Similar Events You Might Like
                   </h2>

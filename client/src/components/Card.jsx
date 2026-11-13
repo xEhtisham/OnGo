@@ -1,7 +1,7 @@
 export function Card({ children, className = '', ...props }) {
   return (
     <div
-      className={`bg-card rounded-2xl border border-border shadow-sm p-6 ${className}`}
+      className={`bg-surface-container-lowest rounded-2xl border border-surface-container shadow-sm p-6 ${className}`}
       {...props}
     >
       {children}
@@ -20,7 +20,7 @@ export function CardHeader({ children, className = '', ...props }) {
 export function CardTitle({ children, className = '', ...props }) {
   return (
     <h3
-      className={`text-xl font-bold text-text tracking-tight ${className}`}
+      className={`text-xl font-bold text-on-surface tracking-tight ${className}`}
       {...props}
     >
       {children}
@@ -30,7 +30,7 @@ export function CardTitle({ children, className = '', ...props }) {
 
 export function CardDescription({ children, className = '', ...props }) {
   return (
-    <p className={`text-sm text-muted mt-1 ${className}`} {...props}>
+    <p className={`text-sm text-on-surface-variant mt-1 ${className}`} {...props}>
       {children}
     </p>
   );
@@ -47,7 +47,7 @@ export function CardContent({ children, className = '', ...props }) {
 export function CardFooter({ children, className = '', ...props }) {
   return (
     <div
-      className={`mt-6 pt-4 border-t border-border flex items-center justify-between ${className}`}
+      className={`mt-6 pt-4 border-t border-surface-container flex items-center justify-between ${className}`}
       {...props}
     >
       {children}

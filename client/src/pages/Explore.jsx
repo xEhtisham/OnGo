@@ -4,15 +4,15 @@ import api from '../services/api';
 import EventCard from '../components/EventCard';
 
 const CATEGORIES = [
-  { name: 'All', icon: '✨' },
-  { name: 'Music', icon: '🎵' },
-  { name: 'Sports', icon: '⚽' },
-  { name: 'Food & Drink', icon: '🍽️' },
-  { name: 'Arts & Culture', icon: '🎭' },
-  { name: 'Business', icon: '💼' },
-  { name: 'Education', icon: '📚' },
-  { name: 'Technology', icon: '💻' },
-  { name: 'Other', icon: '🎪' },
+  { name: 'All', icon: 'apps' },
+  { name: 'Music', icon: 'music_note' },
+  { name: 'Sports', icon: 'sports_soccer' },
+  { name: 'Food & Drink', icon: 'restaurant' },
+  { name: 'Arts & Culture', icon: 'palette' },
+  { name: 'Business', icon: 'business_center' },
+  { name: 'Education', icon: 'menu_book' },
+  { name: 'Technology', icon: 'computer' },
+  { name: 'Other', icon: 'celebration' },
 ];
 
 const CITIES = [
@@ -240,10 +240,11 @@ export default function Explore() {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface cursor-pointer"
                 title="Clear search"
+                aria-label="Clear search"
               >
-                ✕
+                <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             )}
           </div>
@@ -303,13 +304,13 @@ export default function Explore() {
                 key={cat.name}
                 type="button"
                 onClick={() => handleCategorySelect(cat.name)}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   isActive
                     ? 'bg-primary-container text-white shadow-xs'
                     : 'bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface'
                 }`}
               >
-                <span>{cat.icon}</span>
+                <span className="material-symbols-outlined text-[15px]">{cat.icon}</span>
                 <span>{cat.name}</span>
               </button>
             );
@@ -402,7 +403,7 @@ export default function Explore() {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-primary-container hover:underline font-bold flex-shrink-0 ml-3"
+              className="text-primary-container hover:underline font-bold flex-shrink-0 ml-3 cursor-pointer"
             >
               Reset Filters
             </button>
@@ -459,7 +460,7 @@ export default function Explore() {
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="px-4 py-2 rounded-xl bg-primary-container text-white text-xs font-bold shadow-xs hover:bg-primary transition"
+              className="px-4 py-2 rounded-xl bg-primary-container text-white text-xs font-bold shadow-xs hover:bg-primary transition cursor-pointer"
             >
               Reset All Filters
             </button>
@@ -480,9 +481,10 @@ export default function Explore() {
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 rounded-xl border border-surface-container bg-surface-container-lowest text-xs font-bold text-on-surface hover:bg-surface-container-low disabled:opacity-40 disabled:hover:bg-surface-container-lowest transition"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-surface-container bg-surface-container-lowest text-xs font-bold text-on-surface hover:bg-surface-container-low disabled:opacity-40 disabled:hover:bg-surface-container-lowest transition cursor-pointer disabled:cursor-not-allowed"
           >
-            ← Previous
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <span>Previous</span>
           </button>
 
           <span className="px-4 text-xs font-bold text-on-surface-variant">
@@ -492,9 +494,10 @@ export default function Explore() {
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded-xl border border-surface-container bg-surface-container-lowest text-xs font-bold text-on-surface hover:bg-surface-container-low disabled:opacity-40 disabled:hover:bg-surface-container-lowest transition"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-surface-container bg-surface-container-lowest text-xs font-bold text-on-surface hover:bg-surface-container-low disabled:opacity-40 disabled:hover:bg-surface-container-lowest transition cursor-pointer disabled:cursor-not-allowed"
           >
-            Next →
+            <span>Next</span>
+            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
           </button>
         </div>
       )}

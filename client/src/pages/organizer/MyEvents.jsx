@@ -221,10 +221,12 @@ export default function MyEvents() {
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface text-xs"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface text-xs cursor-pointer"
+                aria-label="Clear search"
               >
-                ✕
+                <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             )}
           </div>
@@ -437,9 +439,10 @@ export default function MyEvents() {
                   <button
                     type="button"
                     onClick={() => setAttendeeModalEvent(null)}
-                    className="p-1.5 rounded-full text-outline hover:text-on-surface hover:bg-surface-container-low transition"
+                    className="p-1.5 rounded-full text-outline hover:text-on-surface hover:bg-surface-container-low transition cursor-pointer"
+                    aria-label="Close"
                   >
-                    ✕
+                    <span className="material-symbols-outlined text-[20px]">close</span>
                   </button>
                 </div>
               </div>
@@ -488,10 +491,12 @@ export default function MyEvents() {
                     />
                     {attendeeSearch && (
                       <button
+                        type="button"
                         onClick={() => setAttendeeSearch('')}
-                        className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-outline hover:text-on-surface text-xs"
+                        className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-outline hover:text-on-surface text-xs cursor-pointer"
+                        aria-label="Clear search"
                       >
-                        ✕
+                        <span className="material-symbols-outlined text-[16px]">close</span>
                       </button>
                     )}
                   </div>
@@ -526,7 +531,9 @@ export default function MyEvents() {
                 </div>
               ) : eventAttendees.length === 0 ? (
                 <div className="py-10 text-center space-y-2">
-                  <span className="text-3xl">👥</span>
+                  <div className="w-12 h-12 mx-auto rounded-full bg-surface-container-low flex items-center justify-center text-outline">
+                    <span className="material-symbols-outlined text-[26px]">group</span>
+                  </div>
                   <h4 className="text-sm font-bold text-on-surface">No attendees yet</h4>
                   <p className="text-xs text-muted max-w-xs mx-auto">
                     When attendees reserve tickets for this event, their booking references will appear here.

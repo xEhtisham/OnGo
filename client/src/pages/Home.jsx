@@ -4,15 +4,15 @@ import api from '../services/api';
 import EventCard from '../components/EventCard';
 
 const CATEGORIES = [
-  { name: 'All Categories', icon: '✨' },
-  { name: 'Music', icon: '🎵' },
-  { name: 'Sports', icon: '⚽' },
-  { name: 'Food & Drink', icon: '🍽️' },
-  { name: 'Arts & Culture', icon: '🎭' },
-  { name: 'Business', icon: '💼' },
-  { name: 'Technology', icon: '💻' },
-  { name: 'Education', icon: '📚' },
-  { name: 'Festivals', icon: '🎪' },
+  { name: 'All Categories', icon: 'apps' },
+  { name: 'Music', icon: 'music_note' },
+  { name: 'Sports', icon: 'sports_soccer' },
+  { name: 'Food & Drink', icon: 'restaurant' },
+  { name: 'Arts & Culture', icon: 'palette' },
+  { name: 'Business', icon: 'business_center' },
+  { name: 'Technology', icon: 'computer' },
+  { name: 'Education', icon: 'menu_book' },
+  { name: 'Festivals', icon: 'celebration' },
 ];
 
 export default function Home() {
@@ -172,7 +172,8 @@ export default function Home() {
         {featuredEvent && (
           <div className="max-w-7xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
             {/* Primary Featured Card */}
-            <div className="md:col-span-8 relative rounded-2xl overflow-hidden shadow-lg group min-h-[380px] lg:min-h-[440px] flex flex-col justify-end p-6 sm:p-8">
+            <Link to={`/events/${featuredEvent._id}`} className="md:col-span-8 block">
+            <div className="relative rounded-2xl overflow-hidden shadow-lg group min-h-[380px] lg:min-h-[440px] flex flex-col justify-end p-6 sm:p-8 cursor-pointer">
               <img
                 src={featuredEvent.coverImage}
                 alt={featuredEvent.title}
@@ -201,16 +202,14 @@ export default function Home() {
                   <span className="text-white font-bold text-base">
                     From PKR {featuredEvent.ticketTypes?.[0]?.price ? Number(featuredEvent.ticketTypes[0].price).toLocaleString() : '0'}
                   </span>
-                  <Link
-                    to={`/events/${featuredEvent._id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-secondary-container hover:bg-secondary text-white font-bold text-sm shadow-md transition-all active:scale-[0.98]"
-                  >
+                  <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-secondary-container hover:bg-secondary text-white font-bold text-sm shadow-md transition-all active:scale-[0.98]">
                     <span>Book Pass</span>
                     <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-                  </Link>
+                  </div>
                 </div>
               </div>
             </div>
+            </Link>
 
             {/* Secondary Editorial Cards */}
             <div className="md:col-span-4 flex flex-col gap-6">
@@ -288,7 +287,7 @@ export default function Home() {
                       : 'bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface'
                   }`}
                 >
-                  <span>{cat.icon}</span>
+                  <span className="material-symbols-outlined text-[15px]">{cat.icon}</span>
                   <span>{cat.name}</span>
                 </button>
               );
@@ -345,12 +344,12 @@ export default function Home() {
             </div>
           ) : events.length === 0 ? (
             <div className="py-16 text-center bg-surface-container-lowest rounded-2xl border border-surface-container p-8">
-              <span className="text-4xl">🎪</span>
+              <span className="material-symbols-outlined text-[40px] text-outline">event_busy</span>
               <h3 className="font-bold text-lg text-on-surface mt-2">No events found in this category</h3>
               <p className="text-xs text-muted mt-1">Try switching categories or view all upcoming events.</p>
               <button
                 onClick={() => setSelectedCategory('All Categories')}
-                className="mt-4 px-4 py-2 rounded-xl bg-primary-container text-white text-xs font-bold"
+                className="mt-4 px-4 py-2 rounded-xl bg-primary-container text-white text-xs font-bold cursor-pointer"
               >
                 Reset to All Categories
               </button>
